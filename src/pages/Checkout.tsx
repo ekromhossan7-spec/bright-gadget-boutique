@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,8 +23,24 @@ const Checkout = () => {
   });
 
   const [shippingZone, setShippingZone] = useState("inside_dhaka");
-  const deliveryCharge = totalPrice >= 5000 ? 0 : shippingZone === "inside_dhaka" ? 60 : 120;
-  const partialPayment = paymentMethod === "partial" ? Math.ceil((totalPrice + deliveryCharge) * 0.1) : 0;
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
+
+  useEffect(() => {
+    const fetchSetting = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "free_delivery")
+        .maybeSingle();
+      if (data?.value && typeof data.value === "object" && "enabled" in data.value) {
+        setFreeDeliveryEnabled((data.value as { enabled: boolean }).enabled);
+      }
+    };
+    fetchSetting();
+  }, []);
+
+  const deliveryCharge = freeDeliveryEnabled ? 0 : (totalPrice >= 5000 ? 0 : shippingZone === "inside_dhaka" ? 60 : 120);
+  const partialPayment = paymentMethod === "partial" ? Math.ceil((totalPrice + deliveryCharge) * 0.05) : 0;
   const grandTotal = totalPrice + deliveryCharge;
 
   const { markCompleted } = useAbandonedCheckout(form, paymentMethod, items, totalPrice, deliveryCharge, grandTotal);
