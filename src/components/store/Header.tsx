@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import logo from "@/assets/logo.png";
 
 const navLinks = [
   { label: "Home", href: "/" },
@@ -42,10 +43,8 @@ const Header = () => {
 
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">T</span>
-          </div>
-          <span className="font-display font-bold text-xl tracking-tight">Techllect</span>
+          <img src={logo} alt="Techllect" className="h-10 w-10 object-contain" />
+          <span className="font-display font-bold text-xl tracking-tight hidden sm:inline">Techllect</span>
         </Link>
 
         {/* Desktop nav */}
