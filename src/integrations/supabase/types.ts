@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      abandoned_checkouts: {
+        Row: {
+          address: string | null
+          area: string | null
+          city: string | null
+          created_at: string
+          delivery_charge: number | null
+          email: string | null
+          id: string
+          items: Json | null
+          name: string | null
+          notes: string | null
+          payment_method: string | null
+          phone: string | null
+          recovered_at: string | null
+          recovered_order_id: string | null
+          session_id: string
+          status: string
+          subtotal: number | null
+          total: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          address?: string | null
+          area?: string | null
+          city?: string | null
+          created_at?: string
+          delivery_charge?: number | null
+          email?: string | null
+          id?: string
+          items?: Json | null
+          name?: string | null
+          notes?: string | null
+          payment_method?: string | null
+          phone?: string | null
+          recovered_at?: string | null
+          recovered_order_id?: string | null
+          session_id: string
+          status?: string
+          subtotal?: number | null
+          total?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          address?: string | null
+          area?: string | null
+          city?: string | null
+          created_at?: string
+          delivery_charge?: number | null
+          email?: string | null
+          id?: string
+          items?: Json | null
+          name?: string | null
+          notes?: string | null
+          payment_method?: string | null
+          phone?: string | null
+          recovered_at?: string | null
+          recovered_order_id?: string | null
+          session_id?: string
+          status?: string
+          subtotal?: number | null
+          total?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "abandoned_checkouts_recovered_order_id_fkey"
+            columns: ["recovered_order_id"]
+            isOneToOne: false
+            referencedRelation: "orders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       categories: {
         Row: {
           created_at: string
