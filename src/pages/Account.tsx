@@ -16,6 +16,7 @@ import { useIsAdmin } from "@/hooks/use-admin";
 const Account = () => {
   const { user, signOut, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const isAdmin = useIsAdmin();
   const [profile, setProfile] = useState({ full_name: "", email: "", phone: "" });
   const [address, setAddress] = useState({ address: "", city: "", area: "", zip: "" });
   const [orders, setOrders] = useState<any[]>([]);
