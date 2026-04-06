@@ -90,7 +90,14 @@ const AdminCategories = () => {
               <div><Label>Name *</Label><Input value={editCat.name} onChange={(e) => setEditCat({ ...editCat, name: e.target.value, slug: generateSlug(e.target.value) })} /></div>
               <div><Label>Slug</Label><Input value={editCat.slug} onChange={(e) => setEditCat({ ...editCat, slug: e.target.value })} /></div>
               <div><Label>Description</Label><Input value={editCat.description || ""} onChange={(e) => setEditCat({ ...editCat, description: e.target.value })} /></div>
-              <div><Label>Image URL</Label><Input value={editCat.image_url || ""} onChange={(e) => setEditCat({ ...editCat, image_url: e.target.value })} /></div>
+              <div>
+                <Label>Image</Label>
+                <SingleImageUpload
+                  image={editCat.image_url || ""}
+                  onChange={(url) => setEditCat({ ...editCat, image_url: url })}
+                  folder="categories"
+                />
+              </div>
               <div><Label>Sort Order</Label><Input type="number" value={editCat.sort_order || 0} onChange={(e) => setEditCat({ ...editCat, sort_order: Number(e.target.value) })} /></div>
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => setEditCat(null)}>Cancel</Button>
