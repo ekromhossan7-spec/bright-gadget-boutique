@@ -106,6 +106,26 @@ const Checkout = () => {
                     <div className="sm:col-span-2"><Label htmlFor="address">Address *</Label><Input id="address" name="address" required value={form.address} onChange={handleChange} /></div>
                     <div><Label htmlFor="city">City *</Label><Input id="city" name="city" required value={form.city} onChange={handleChange} /></div>
                     <div><Label htmlFor="area">Area</Label><Input id="area" name="area" value={form.area} onChange={handleChange} /></div>
+                    <div className="sm:col-span-2">
+                      <Label className="mb-2 block">Shipping Zone *</Label>
+                      <RadioGroup value={shippingZone} onValueChange={setShippingZone} className="flex flex-col sm:flex-row gap-3">
+                        <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer flex-1 ${shippingZone === "inside_dhaka" ? "border-primary bg-primary/5" : "hover:bg-secondary/50"}`}>
+                          <RadioGroupItem value="inside_dhaka" id="inside_dhaka" />
+                          <Label htmlFor="inside_dhaka" className="cursor-pointer">
+                            <span className="font-medium">Inside Dhaka</span>
+                            <p className="text-sm text-muted-foreground">৳60 (1-2 days)</p>
+                          </Label>
+                        </div>
+                        <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer flex-1 ${shippingZone === "outside_dhaka" ? "border-primary bg-primary/5" : "hover:bg-secondary/50"}`}>
+                          <RadioGroupItem value="outside_dhaka" id="outside_dhaka" />
+                          <Label htmlFor="outside_dhaka" className="cursor-pointer">
+                            <span className="font-medium">Outside Dhaka</span>
+                            <p className="text-sm text-muted-foreground">৳120 (3-5 days)</p>
+                          </Label>
+                        </div>
+                      </RadioGroup>
+                      {totalPrice >= 5000 && <p className="text-sm text-green-600 mt-2 font-medium">🎉 Free shipping on orders above ৳5,000!</p>}
+                    </div>
                     <div className="sm:col-span-2"><Label htmlFor="notes">Order Notes</Label><Textarea id="notes" name="notes" value={form.notes} onChange={handleChange} placeholder="Special delivery instructions..." /></div>
                   </div>
                 </div>
