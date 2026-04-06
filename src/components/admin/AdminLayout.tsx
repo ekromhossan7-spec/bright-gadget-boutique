@@ -1,14 +1,16 @@
-import { Outlet, Link, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   SidebarProvider, SidebarTrigger, Sidebar, SidebarContent,
   SidebarGroup, SidebarGroupLabel, SidebarGroupContent,
   SidebarMenu, SidebarMenuItem, SidebarMenuButton, useSidebar,
 } from "@/components/ui/sidebar";
 import { NavLink } from "@/components/NavLink";
-import { LayoutDashboard, Package, ShoppingCart, Users, Settings, CreditCard, Truck, Tag, FileText, BarChart3, ArrowLeft } from "lucide-react";
+import { LayoutDashboard, Package, ShoppingCart, Users, Settings, CreditCard, Truck, Tag, FileText, BarChart3, ArrowLeft, ShieldAlert } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const navItems = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
@@ -26,7 +28,6 @@ const navItems = [
 function AdminSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
-  const location = useLocation();
 
   return (
     <Sidebar collapsible="icon">
@@ -56,14 +57,51 @@ function AdminSidebar() {
 }
 
 const AdminLayout = () => {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
 
   useEffect(() => {
-    if (!loading && !user) navigate("/login");
-  }, [user, loading, navigate]);
+    if (!authLoading && !user) {
+      navigate("/login");
+      return;
+    }
+    if (user) {
+      const checkRole = async () => {
+        const { data } = await supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", user.id)
+          .eq("role", "admin")
+          .maybeSingle();
+        setIsAdmin(!!data);
+      };
+      checkRole();
+    }
+  }, [user, authLoading, navigate]);
 
-  if (loading || !user) return null;
+  if (authLoading || isAdmin === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="space-y-3 w-64"><Skeleton className="h-8 w-full" /><Skeleton className="h-4 w-3/4" /><Skeleton className="h-4 w-1/2" /></div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center max-w-md px-4">
+          <div className="w-16 h-16 rounded-full bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+            <ShieldAlert className="h-8 w-8 text-destructive" />
+          </div>
+          <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+          <p className="text-muted-foreground mb-6">You don't have admin privileges. Contact the administrator for access.</p>
+          <Button asChild className="rounded-full"><Link to="/">Back to Store</Link></Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
