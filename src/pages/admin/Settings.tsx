@@ -139,19 +139,11 @@ const AdminSettings = () => {
       <Card className="p-6 space-y-4">
         <h2 className="font-bold text-lg">Hero Section Image</h2>
         <p className="text-sm text-muted-foreground">Set the main image displayed on the homepage hero section.</p>
-        <div>
-          <Label>Image URL</Label>
-          <Input
-            value={heroImage}
-            onChange={(e) => setHeroImage(e.target.value)}
-            placeholder="https://example.com/image.jpg"
-          />
-        </div>
-        {heroImage && (
-          <div className="w-48 h-48 rounded-xl overflow-hidden border bg-secondary">
-            <img src={heroImage} alt="Hero preview" className="w-full h-full object-cover" />
-          </div>
-        )}
+        <SingleImageUpload
+          image={heroImage}
+          onChange={(url) => setHeroImage(url)}
+          folder="hero"
+        />
         <Button
           className="rounded-full"
           disabled={saving === "hero_image"}
