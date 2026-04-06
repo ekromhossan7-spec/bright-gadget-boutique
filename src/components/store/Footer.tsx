@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
+import logo from "@/assets/logo.png";
 
 const Footer = () => {
   return (
@@ -9,13 +10,11 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-                <span className="text-accent-foreground font-bold text-sm">T</span>
-              </div>
+              <img src={logo} alt="Techllect" className="h-10 w-10 object-contain brightness-0 invert" />
               <span className="font-display font-bold text-xl">Techllect</span>
             </div>
             <p className="text-primary-foreground/60 text-sm mb-4 leading-relaxed">
-              Your trusted destination for premium gadgets and tech accessories in Bangladesh.
+              Enjoy new gadgets with a touch of technology. Your trusted destination for premium gadgets in Bangladesh.
             </p>
             <div className="flex gap-3">
               <a href="#" className="w-9 h-9 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors">
