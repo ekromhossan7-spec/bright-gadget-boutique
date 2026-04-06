@@ -10,7 +10,8 @@ import { toast } from "sonner";
 import Header from "@/components/store/Header";
 import TopBar from "@/components/store/TopBar";
 import Footer from "@/components/store/Footer";
-import { User, Package, MapPin, KeyRound, LogOut, Eye, EyeOff } from "lucide-react";
+import { User, Package, MapPin, KeyRound, LogOut, Eye, EyeOff, Shield } from "lucide-react";
+import { useIsAdmin } from "@/hooks/use-admin";
 
 const Account = () => {
   const { user, signOut, loading: authLoading } = useAuth();
