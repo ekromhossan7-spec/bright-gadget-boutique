@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Search, Eye, MoreHorizontal, Trash2, Ban, Plus, Undo2, Truck, RefreshCw, Loader2 } from "lucide-react";
+import { FraudBadge, FraudDetail } from "@/components/admin/FraudCheck";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -269,6 +270,7 @@ const AdminOrders = () => {
               <th className="text-left p-3 font-medium">Status</th>
               <th className="text-left p-3 font-medium">Payment</th>
               <th className="text-left p-3 font-medium">Courier</th>
+              <th className="text-left p-3 font-medium">Risk</th>
               <th className="text-left p-3 font-medium">Date</th>
               <th className="p-3 font-medium text-center">Actions</th>
             </tr>
@@ -312,6 +314,9 @@ const AdminOrders = () => {
                       <span className="text-xs text-muted-foreground">—</span>
                     )}
                   </td>
+                  <td className="p-3">
+                    <FraudBadge order={o} allOrders={orders} />
+                  </td>
                   <td className="p-3 text-muted-foreground text-xs whitespace-nowrap">
                     {new Date(o.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                   </td>
@@ -352,7 +357,7 @@ const AdminOrders = () => {
               );
             })}
             {filtered.length === 0 && (
-              <tr><td colSpan={10} className="p-8 text-center text-muted-foreground">{tab === "trash" ? "Trash is empty" : "No orders found"}</td></tr>
+              <tr><td colSpan={11} className="p-8 text-center text-muted-foreground">{tab === "trash" ? "Trash is empty" : "No orders found"}</td></tr>
             )}
           </tbody>
         </table>
@@ -370,6 +375,9 @@ const AdminOrders = () => {
                 <div><span className="text-muted-foreground text-xs">Date</span><p className="font-medium">{new Date(selectedOrder.created_at).toLocaleString()}</p></div>
                 <div><span className="text-muted-foreground text-xs">Total</span><p className="font-bold text-accent text-lg">৳{Number(selectedOrder.total).toLocaleString()}</p></div>
               </div>
+
+              {/* Fraud Check */}
+              <FraudDetail order={selectedOrder} allOrders={orders} />
 
               {/* Courier Info */}
               {selectedOrder.consignment_id && (
