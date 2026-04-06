@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Plus, Edit, Trash2, Save, FolderTree } from "lucide-react";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import SingleImageUpload from "@/components/admin/SingleImageUpload";
 
 const AdminCategories = () => {
   const [categories, setCategories] = useState<any[]>([]);
