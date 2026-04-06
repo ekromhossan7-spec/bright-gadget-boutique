@@ -270,6 +270,7 @@ const AdminOrders = () => {
               <th className="text-left p-3 font-medium">Status</th>
               <th className="text-left p-3 font-medium">Payment</th>
               <th className="text-left p-3 font-medium">Courier</th>
+              <th className="text-left p-3 font-medium">Risk</th>
               <th className="text-left p-3 font-medium">Date</th>
               <th className="p-3 font-medium text-center">Actions</th>
             </tr>
