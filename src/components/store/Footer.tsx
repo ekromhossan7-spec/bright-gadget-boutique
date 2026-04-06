@@ -10,14 +10,14 @@ const Footer = () => {
           {/* Brand */}
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="Techllect" className="h-10 w-10 object-contain brightness-0 invert" />
+              <img src={logo} alt="Techllect" className="h-10 w-10 object-contain" />
               <span className="font-display font-bold text-xl">Techllect</span>
             </div>
             <p className="text-primary-foreground/60 text-sm mb-4 leading-relaxed">
               Enjoy new gadgets with a touch of technology. Your trusted destination for premium gadgets in Bangladesh.
             </p>
             <div className="flex gap-3">
-              <a href="#" className="w-9 h-9 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors">
+              <a href="https://www.facebook.com/Techllect/" target="_blank" rel="noopener noreferrer" className="w-9 h-9 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors">
                 <Facebook className="h-4 w-4" />
               </a>
               <a href="#" className="w-9 h-9 rounded-full bg-primary-foreground/10 flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors">
@@ -34,7 +34,6 @@ const Footer = () => {
             <h3 className="font-semibold mb-4">Quick Links</h3>
             <ul className="space-y-2 text-sm text-primary-foreground/60">
               <li><Link to="/shop" className="hover:text-accent transition-colors">Shop All</Link></li>
-              <li><Link to="/categories" className="hover:text-accent transition-colors">Categories</Link></li>
               <li><Link to="/about" className="hover:text-accent transition-colors">About Us</Link></li>
               <li><Link to="/contact" className="hover:text-accent transition-colors">Contact</Link></li>
             </ul>
@@ -57,7 +56,7 @@ const Footer = () => {
             <ul className="space-y-3 text-sm text-primary-foreground/60">
               <li className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-accent" />
-                +880 1XXX-XXXXXX
+                <a href="tel:+8801835925510" className="hover:text-accent transition-colors">+88 01835 925510</a>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-accent" />
