@@ -70,6 +70,15 @@ const Header = () => {
             <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}><Search className="h-5 w-5" /></Button>
           )}
 
+          <Link to="/cart" className="relative">
+            <Button variant="ghost" size="icon">
+              <ShoppingCart className="h-5 w-5" />
+              {totalItems > 0 && (
+                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] bg-accent text-accent-foreground">{totalItems}</Badge>
+              )}
+            </Button>
+          </Link>
+
           <Link to="/wishlist" className="relative">
             <Button variant="ghost" size="icon">
               <Heart className="h-5 w-5" />
@@ -89,15 +98,6 @@ const Header = () => {
 
           <Link to={user ? "/account" : "/login"}>
             <Button variant="ghost" size="icon"><User className="h-5 w-5" /></Button>
-          </Link>
-
-          <Link to="/cart" className="relative">
-            <Button variant="ghost" size="icon">
-              <ShoppingCart className="h-5 w-5" />
-              {totalItems > 0 && (
-                <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] bg-accent text-accent-foreground">{totalItems}</Badge>
-              )}
-            </Button>
           </Link>
         </div>
       </div>
