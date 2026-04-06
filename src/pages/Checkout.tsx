@@ -60,6 +60,7 @@ const Checkout = () => {
 
       if (error) throw error;
 
+      await markCompleted();
       clearCart();
       toast.success("Order placed successfully!");
       navigate(`/order-success?order=${orderNumber}`);
