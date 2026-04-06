@@ -10,7 +10,7 @@ const STEADFAST_BASE = "https://portal.packzy.com/api/v1";
 async function steadfastFetch(path: string, options: RequestInit = {}) {
   const apiKey = Deno.env.get("STEADFAST_API_KEY")!;
   const secretKey = Deno.env.get("STEADFAST_SECRET_KEY")!;
-  
+
   const res = await fetch(`${STEADFAST_BASE}${path}`, {
     ...options,
     headers: {
@@ -20,7 +20,14 @@ async function steadfastFetch(path: string, options: RequestInit = {}) {
       ...(options.headers || {}),
     },
   });
-  return res.json();
+
+  const contentType = res.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return res.json();
+  } else {
+    const errorText = await res.text();
+    throw new Error(`Steadfast API error: ${errorText}`);
+  }
 }
 
 Deno.serve(async (req) => {
