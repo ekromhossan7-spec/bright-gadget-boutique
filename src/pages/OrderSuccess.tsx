@@ -20,8 +20,8 @@ const OrderSuccess = () => {
           animate={{ opacity: 1, scale: 1 }}
           className="text-center max-w-lg mx-auto px-4"
         >
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="h-10 w-10 text-green-600" />
+          <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle className="h-10 w-10 text-accent" />
           </div>
           <h1 className="text-3xl font-bold mb-2">Order Confirmed!</h1>
           <p className="text-muted-foreground mb-6">
