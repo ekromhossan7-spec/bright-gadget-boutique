@@ -11,6 +11,7 @@ import Footer from "@/components/store/Footer";
 import TopBar from "@/components/store/TopBar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAbandonedCheckout } from "@/hooks/use-abandoned-checkout";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
@@ -24,6 +25,8 @@ const Checkout = () => {
   const deliveryCharge = totalPrice >= 5000 ? 0 : 120;
   const partialPayment = paymentMethod === "partial" ? Math.ceil((totalPrice + deliveryCharge) * 0.1) : 0;
   const grandTotal = totalPrice + deliveryCharge;
+
+  const { markCompleted } = useAbandonedCheckout(form, paymentMethod, items, totalPrice, deliveryCharge, grandTotal);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -57,6 +60,7 @@ const Checkout = () => {
 
       if (error) throw error;
 
+      await markCompleted();
       clearCart();
       toast.success("Order placed successfully!");
       navigate(`/order-success?order=${orderNumber}`);

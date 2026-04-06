@@ -12,7 +12,7 @@ import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard, Package, ShoppingCart, Users, Settings, CreditCard,
   Truck, Tag, FileText, BarChart3, ArrowLeft, ShieldAlert, ChevronDown,
-  PlusCircle, FolderTree, MapPin, Store, LogOut,
+  PlusCircle, FolderTree, MapPin, Store, LogOut, AlertTriangle, Activity,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -38,6 +38,8 @@ const productNav = {
 };
 
 const bottomNav = [
+  { title: "Incomplete Orders", url: "/admin/incomplete-orders", icon: AlertTriangle },
+  { title: "Recovery Analytics", url: "/admin/recovery-analytics", icon: Activity },
   { title: "Pages", url: "/admin/pages", icon: FileText },
   { title: "Reports", url: "/admin/reports", icon: BarChart3 },
   { title: "Settings", url: "/admin/settings", icon: Settings },

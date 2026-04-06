@@ -41,6 +41,8 @@ import AdminCoupons from "./pages/admin/Coupons";
 import AdminShipping from "./pages/admin/Shipping";
 import AdminPages from "./pages/admin/Pages";
 import AdminCategories from "./pages/admin/Categories";
+import AdminIncompleteOrders from "./pages/admin/IncompleteOrders";
+import AdminRecoveryAnalytics from "./pages/admin/RecoveryAnalytics";
 
 const queryClient = new QueryClient();
 
@@ -88,6 +90,8 @@ const App = () => (
                   <Route path="shipping" element={<AdminShipping />} />
                   <Route path="pages" element={<AdminPages />} />
                   <Route path="categories" element={<AdminCategories />} />
+                  <Route path="incomplete-orders" element={<AdminIncompleteOrders />} />
+                  <Route path="recovery-analytics" element={<AdminRecoveryAnalytics />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
