@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,8 +23,24 @@ const Checkout = () => {
   });
 
   const [shippingZone, setShippingZone] = useState("inside_dhaka");
-  const deliveryCharge = totalPrice >= 5000 ? 0 : shippingZone === "inside_dhaka" ? 60 : 120;
-  const partialPayment = paymentMethod === "partial" ? Math.ceil((totalPrice + deliveryCharge) * 0.1) : 0;
+  const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
+
+  useEffect(() => {
+    const fetchSetting = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "free_delivery")
+        .maybeSingle();
+      if (data?.value && typeof data.value === "object" && "enabled" in data.value) {
+        setFreeDeliveryEnabled((data.value as { enabled: boolean }).enabled);
+      }
+    };
+    fetchSetting();
+  }, []);
+
+  const deliveryCharge = freeDeliveryEnabled ? 0 : (totalPrice >= 5000 ? 0 : shippingZone === "inside_dhaka" ? 60 : 120);
+  const partialPayment = paymentMethod === "partial" ? Math.ceil((totalPrice + deliveryCharge) * 0.05) : 0;
   const grandTotal = totalPrice + deliveryCharge;
 
   const { markCompleted } = useAbandonedCheckout(form, paymentMethod, items, totalPrice, deliveryCharge, grandTotal);
@@ -113,18 +129,19 @@ const Checkout = () => {
                           <RadioGroupItem value="inside_dhaka" id="inside_dhaka" />
                           <Label htmlFor="inside_dhaka" className="cursor-pointer">
                             <span className="font-medium">Inside Dhaka</span>
-                            <p className="text-sm text-muted-foreground">৳60 (1-2 days)</p>
+                            <p className="text-sm text-muted-foreground">{freeDeliveryEnabled ? "Free" : "৳60"} (1-2 days)</p>
                           </Label>
                         </div>
                         <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer flex-1 ${shippingZone === "outside_dhaka" ? "border-primary bg-primary/5" : "hover:bg-secondary/50"}`}>
                           <RadioGroupItem value="outside_dhaka" id="outside_dhaka" />
                           <Label htmlFor="outside_dhaka" className="cursor-pointer">
                             <span className="font-medium">Outside Dhaka</span>
-                            <p className="text-sm text-muted-foreground">৳120 (3-5 days)</p>
+                            <p className="text-sm text-muted-foreground">{freeDeliveryEnabled ? "Free" : "৳120"} (3-5 days)</p>
                           </Label>
                         </div>
                       </RadioGroup>
-                      {totalPrice >= 5000 && <p className="text-sm text-green-600 mt-2 font-medium">🎉 Free shipping on orders above ৳5,000!</p>}
+                      {freeDeliveryEnabled && <p className="text-sm text-green-600 mt-2 font-medium">🎉 Free delivery on all orders!</p>}
+                      {!freeDeliveryEnabled && totalPrice >= 5000 && <p className="text-sm text-green-600 mt-2 font-medium">🎉 Free shipping on orders above ৳5,000!</p>}
                     </div>
                     <div className="sm:col-span-2"><Label htmlFor="notes">Order Notes</Label><Textarea id="notes" name="notes" value={form.notes} onChange={handleChange} placeholder="Special delivery instructions..." /></div>
                   </div>
@@ -143,8 +160,8 @@ const Checkout = () => {
                     <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-secondary/50">
                       <RadioGroupItem value="partial" id="partial" />
                       <Label htmlFor="partial" className="cursor-pointer flex-1">
-                        <span className="font-medium">Online Partial Payment (10%)</span>
-                        <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * 0.1).toLocaleString()} now, rest on delivery</p>
+                         <span className="font-medium">Online Partial Payment (5%)</span>
+                        <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * 0.05).toLocaleString()} now, rest on delivery</p>
                       </Label>
                     </div>
                   </RadioGroup>
@@ -171,7 +188,7 @@ const Checkout = () => {
                     <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>৳{totalPrice.toLocaleString()}</span></div>
                     <div className="flex justify-between"><span className="text-muted-foreground">Delivery</span><span>{deliveryCharge === 0 ? "Free" : `৳${deliveryCharge}`}</span></div>
                     {paymentMethod === "partial" && (
-                      <div className="flex justify-between text-accent font-medium"><span>Pay Now (10%)</span><span>৳{partialPayment.toLocaleString()}</span></div>
+                      <div className="flex justify-between text-accent font-medium"><span>Pay Now (5%)</span><span>৳{partialPayment.toLocaleString()}</span></div>
                     )}
                     <div className="border-t pt-2 flex justify-between font-bold text-base"><span>Total</span><span>৳{grandTotal.toLocaleString()}</span></div>
                   </div>
