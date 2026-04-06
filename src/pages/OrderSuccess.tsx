@@ -35,7 +35,7 @@ const OrderSuccess = () => {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Status</span>
-              <span className="font-medium text-green-600">Confirmed</span>
+              <span className="font-medium text-accent">Confirmed</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Estimated Delivery</span>
