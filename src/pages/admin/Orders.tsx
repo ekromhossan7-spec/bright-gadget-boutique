@@ -314,6 +314,9 @@ const AdminOrders = () => {
                       <span className="text-xs text-muted-foreground">—</span>
                     )}
                   </td>
+                  <td className="p-3">
+                    <FraudBadge order={o} allOrders={orders} />
+                  </td>
                   <td className="p-3 text-muted-foreground text-xs whitespace-nowrap">
                     {new Date(o.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                   </td>
