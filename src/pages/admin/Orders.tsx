@@ -376,6 +376,9 @@ const AdminOrders = () => {
                 <div><span className="text-muted-foreground text-xs">Total</span><p className="font-bold text-accent text-lg">৳{Number(selectedOrder.total).toLocaleString()}</p></div>
               </div>
 
+              {/* Fraud Check */}
+              <FraudDetail order={selectedOrder} allOrders={orders} />
+
               {/* Courier Info */}
               {selectedOrder.consignment_id && (
                 <div className="border-t pt-3">
