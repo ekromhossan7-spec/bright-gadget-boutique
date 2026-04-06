@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { ShoppingCart, User, Search, Menu, X, Heart } from "lucide-react";
+import { ShoppingCart, User, Search, Menu, X, Heart, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
 import { useAuth } from "@/contexts/AuthContext";
+import { useIsAdmin } from "@/hooks/use-admin";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import logo from "@/assets/logo.png";
@@ -21,6 +22,7 @@ const Header = () => {
   const { totalItems } = useCart();
   const { totalItems: wishlistCount } = useWishlist();
   const { user } = useAuth();
+  const isAdmin = useIsAdmin();
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
@@ -38,6 +40,11 @@ const Header = () => {
               <hr />
               <Link to="/wishlist" className="text-lg font-medium hover:text-accent">Wishlist</Link>
               <Link to={user ? "/account" : "/login"} className="text-lg font-medium hover:text-accent">{user ? "My Account" : "Login"}</Link>
+              {isAdmin && (
+                <Link to="/admin" className="text-lg font-medium text-emerald-600 hover:text-emerald-700 flex items-center gap-2">
+                  <Shield className="h-5 w-5" />Admin Panel
+                </Link>
+              )}
             </div>
           </SheetContent>
         </Sheet>
@@ -71,6 +78,14 @@ const Header = () => {
               )}
             </Button>
           </Link>
+
+          {isAdmin && (
+            <Link to="/admin">
+              <Button variant="ghost" size="icon" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50">
+                <Shield className="h-5 w-5" />
+              </Button>
+            </Link>
+          )}
 
           <Link to={user ? "/account" : "/login"}>
             <Button variant="ghost" size="icon"><User className="h-5 w-5" /></Button>

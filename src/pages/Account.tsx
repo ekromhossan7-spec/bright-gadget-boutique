@@ -10,11 +10,13 @@ import { toast } from "sonner";
 import Header from "@/components/store/Header";
 import TopBar from "@/components/store/TopBar";
 import Footer from "@/components/store/Footer";
-import { User, Package, MapPin, KeyRound, LogOut, Eye, EyeOff } from "lucide-react";
+import { User, Package, MapPin, KeyRound, LogOut, Eye, EyeOff, Shield } from "lucide-react";
+import { useIsAdmin } from "@/hooks/use-admin";
 
 const Account = () => {
   const { user, signOut, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const isAdmin = useIsAdmin();
   const [profile, setProfile] = useState({ full_name: "", email: "", phone: "" });
   const [address, setAddress] = useState({ address: "", city: "", area: "", zip: "" });
   const [orders, setOrders] = useState<any[]>([]);
@@ -85,7 +87,14 @@ const Account = () => {
         <div className="container max-w-4xl">
           <div className="flex items-center justify-between mb-8">
             <h1 className="text-2xl sm:text-3xl font-bold">My Account</h1>
-            <Button variant="outline" onClick={handleLogout} className="rounded-full"><LogOut className="h-4 w-4 mr-2" />Logout</Button>
+            <div className="flex items-center gap-2">
+              {isAdmin && (
+                <Button asChild variant="outline" className="rounded-full border-emerald-500 text-emerald-600 hover:bg-emerald-50">
+                  <Link to="/admin"><Shield className="h-4 w-4 mr-2" />Admin Panel</Link>
+                </Button>
+              )}
+              <Button variant="outline" onClick={handleLogout} className="rounded-full"><LogOut className="h-4 w-4 mr-2" />Logout</Button>
+            </div>
           </div>
 
           <Tabs defaultValue="profile" className="space-y-6">
