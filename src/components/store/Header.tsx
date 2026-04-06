@@ -22,6 +22,7 @@ const Header = () => {
   const { totalItems } = useCart();
   const { totalItems: wishlistCount } = useWishlist();
   const { user } = useAuth();
+  const isAdmin = useIsAdmin();
   const [searchOpen, setSearchOpen] = useState(false);
 
   return (
