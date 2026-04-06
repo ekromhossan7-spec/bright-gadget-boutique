@@ -64,6 +64,14 @@ const Header = () => {
           {searchOpen ? (
             <div className="flex items-center gap-2 animate-in fade-in">
               <Input placeholder="Search products..." className="w-40 sm:w-64 h-9" autoFocus onBlur={() => setSearchOpen(false)} />
+              <Link to="/cart" className="relative">
+                <Button variant="ghost" size="icon" type="button">
+                  <ShoppingCart className="h-5 w-5" />
+                  {totalItems > 0 && (
+                    <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-[10px] bg-accent text-accent-foreground">{totalItems}</Badge>
+                  )}
+                </Button>
+              </Link>
               <Button variant="ghost" size="icon" onClick={() => setSearchOpen(false)}><X className="h-4 w-4" /></Button>
             </div>
           ) : (

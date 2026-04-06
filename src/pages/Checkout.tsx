@@ -55,6 +55,17 @@ const Checkout = () => {
 
     setLoading(true);
     try {
+      // Check stock availability
+      const productIds = items.map(i => i.id);
+      const { data: products } = await supabase.from("products").select("id, name, in_stock, stock_quantity").in("id", productIds);
+      if (products) {
+        const outOfStock = products.filter(p => !p.in_stock);
+        if (outOfStock.length > 0) {
+          toast.error(`Out of stock: ${outOfStock.map(p => p.name).join(", ")}`);
+          setLoading(false);
+          return;
+        }
+      }
       const orderNumber = `TL-${Date.now().toString(36).toUpperCase()}`;
       const { data: user } = await supabase.auth.getUser();
 
