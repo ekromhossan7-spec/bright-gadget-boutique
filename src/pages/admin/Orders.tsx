@@ -66,6 +66,13 @@ const AdminOrders = () => {
     else { toast.success(`${ids.length} order(s) restored`); setSelectedIds(new Set()); fetchOrders(); }
   };
 
+  const permanentDeleteOrders = async (ids: string[]) => {
+    if (!confirm(`Permanently delete ${ids.length} order(s)? This cannot be undone.`)) return;
+    const { error } = await supabase.from("orders").delete().in("id", ids);
+    if (error) toast.error("Failed to delete: " + error.message);
+    else { toast.success(`${ids.length} order(s) permanently deleted`); setSelectedIds(new Set()); fetchOrders(); }
+  };
+
   const bulkUpdateStatus = async (status: string) => {
     const ids = Array.from(selectedIds);
     const { error } = await supabase.from("orders").update({ order_status: status, updated_at: new Date().toISOString() }).in("id", ids);
@@ -251,9 +258,14 @@ const AdminOrders = () => {
             </>
           )}
           {tab === "trash" && (
-            <Button size="sm" variant="outline" onClick={() => restoreOrders(Array.from(selectedIds))}>
-              <Undo2 className="h-4 w-4 mr-1" />Restore
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="outline" onClick={() => restoreOrders(Array.from(selectedIds))}>
+                <Undo2 className="h-4 w-4 mr-1" />Restore
+              </Button>
+              <Button size="sm" variant="destructive" onClick={() => permanentDeleteOrders(Array.from(selectedIds))}>
+                <Trash2 className="h-4 w-4 mr-1" />Delete Forever
+              </Button>
+            </div>
           )}
         </div>
       )}
@@ -346,9 +358,14 @@ const AdminOrders = () => {
                             </DropdownMenuItem>
                           </>
                         ) : (
-                          <DropdownMenuItem onClick={() => restoreOrders([o.id])}>
-                            <Undo2 className="h-4 w-4 mr-2" />Restore
-                          </DropdownMenuItem>
+                          <>
+                            <DropdownMenuItem onClick={() => restoreOrders([o.id])}>
+                              <Undo2 className="h-4 w-4 mr-2" />Restore
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => permanentDeleteOrders([o.id])} className="text-destructive">
+                              <Trash2 className="h-4 w-4 mr-2" />Delete Forever
+                            </DropdownMenuItem>
+                          </>
                         )}
                       </DropdownMenuContent>
                     </DropdownMenu>

@@ -315,7 +315,14 @@ const AdminSettings = () => {
                 <div className="sm:col-span-2"><Label>Title (use \n for line break)</Label><Input value={banner.title} onChange={(e) => updateBanner(i, "title", e.target.value)} placeholder="Up to 40% Off\nAudio Gear" /></div>
                 <div><Label>Button Text</Label><Input value={banner.linkText} onChange={(e) => updateBanner(i, "linkText", e.target.value)} placeholder="Shop Audio →" /></div>
                 <div><Label>Button Link</Label><Input value={banner.linkUrl} onChange={(e) => updateBanner(i, "linkUrl", e.target.value)} placeholder="/shop?category=..." /></div>
-                <div className="sm:col-span-2"><Label>Background Image URL</Label><Input value={banner.imageUrl} onChange={(e) => updateBanner(i, "imageUrl", e.target.value)} placeholder="https://..." /></div>
+                <div className="sm:col-span-2">
+                  <Label>Background Image</Label>
+                  <SingleImageUpload
+                    image={banner.imageUrl}
+                    onChange={(url) => updateBanner(i, "imageUrl", url)}
+                    folder="promo-banners"
+                  />
+                </div>
               </div>
             </div>
           ))}

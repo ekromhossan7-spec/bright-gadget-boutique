@@ -50,7 +50,7 @@ const Header = () => {
         </Sheet>
 
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Techllect" className="h-10 w-10 object-contain" />
+          <img src={logo} alt="Techllect" className="h-10 w-10 rounded-full object-cover border-2 border-accent" />
           <span className="font-display font-bold text-xl tracking-tight hidden sm:inline">Techllect</span>
         </Link>
 
