@@ -123,6 +123,8 @@ export type Database = {
       }
       orders: {
         Row: {
+          consignment_id: string | null
+          courier_status: string | null
           created_at: string
           delivery_charge: number
           guest_email: string | null
@@ -138,11 +140,14 @@ export type Database = {
           shipping_address: Json
           subtotal: number
           total: number
+          tracking_code: string | null
           trashed_at: string | null
           updated_at: string
           user_id: string | null
         }
         Insert: {
+          consignment_id?: string | null
+          courier_status?: string | null
           created_at?: string
           delivery_charge?: number
           guest_email?: string | null
@@ -158,11 +163,14 @@ export type Database = {
           shipping_address?: Json
           subtotal?: number
           total?: number
+          tracking_code?: string | null
           trashed_at?: string | null
           updated_at?: string
           user_id?: string | null
         }
         Update: {
+          consignment_id?: string | null
+          courier_status?: string | null
           created_at?: string
           delivery_charge?: number
           guest_email?: string | null
@@ -178,6 +186,7 @@ export type Database = {
           shipping_address?: Json
           subtotal?: number
           total?: number
+          tracking_code?: string | null
           trashed_at?: string | null
           updated_at?: string
           user_id?: string | null
