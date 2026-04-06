@@ -11,6 +11,7 @@ import Footer from "@/components/store/Footer";
 import TopBar from "@/components/store/TopBar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useAbandonedCheckout } from "@/hooks/use-abandoned-checkout";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
