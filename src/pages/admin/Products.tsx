@@ -78,18 +78,6 @@ const AdminProducts = () => {
     if (error) { toast.error(error.message); } else { toast.success("Product deleted"); fetchData(); }
   };
 
-  const addImage = () => {
-    if (imageInput.trim()) {
-      setEditProduct({ ...editProduct, images: [...(editProduct.images || []), imageInput.trim()] });
-      setImageInput("");
-    }
-  };
-
-  const removeImage = (idx: number) => {
-    const imgs = [...(editProduct.images || [])];
-    imgs.splice(idx, 1);
-    setEditProduct({ ...editProduct, images: imgs });
-  };
 
   const filtered = products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
 
