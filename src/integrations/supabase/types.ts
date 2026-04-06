@@ -138,6 +138,7 @@ export type Database = {
           shipping_address: Json
           subtotal: number
           total: number
+          trashed_at: string | null
           updated_at: string
           user_id: string | null
         }
@@ -157,6 +158,7 @@ export type Database = {
           shipping_address?: Json
           subtotal?: number
           total?: number
+          trashed_at?: string | null
           updated_at?: string
           user_id?: string | null
         }
@@ -176,6 +178,7 @@ export type Database = {
           shipping_address?: Json
           subtotal?: number
           total?: number
+          trashed_at?: string | null
           updated_at?: string
           user_id?: string | null
         }

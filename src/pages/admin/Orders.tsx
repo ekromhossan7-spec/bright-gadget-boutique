@@ -3,12 +3,16 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Search, Eye, MoreHorizontal, Printer, Truck, Ban } from "lucide-react";
+import { Search, Eye, MoreHorizontal, Trash2, Ban, Plus, Undo2, Package } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import AdminCreateOrder from "@/components/admin/AdminCreateOrder";
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
 const PAYMENT_STATUS_OPTIONS = ["pending", "partial", "paid", "refunded"] as const;
@@ -19,6 +23,9 @@ const AdminOrders = () => {
   const [statusFilter, setStatusFilter] = useState("all");
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [tab, setTab] = useState("active");
+  const [createOpen, setCreateOpen] = useState(false);
 
   const fetchOrders = async () => {
     const { data } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
@@ -27,29 +34,37 @@ const AdminOrders = () => {
 
   useEffect(() => { fetchOrders(); }, []);
 
+  const activeOrders = orders.filter(o => !o.trashed_at);
+  const trashedOrders = orders.filter(o => !!o.trashed_at);
+  const currentOrders = tab === "active" ? activeOrders : trashedOrders;
+
   const updateOrderStatus = async (id: string, status: string) => {
     setUpdatingId(id);
     const { error } = await supabase.from("orders").update({ order_status: status, updated_at: new Date().toISOString() }).eq("id", id);
-    if (error) {
-      toast.error("Failed to update status");
-    } else {
-      toast.success(`Order status updated to ${status}`);
-      fetchOrders();
-    }
+    if (error) toast.error("Failed to update status");
+    else { toast.success(`Order status updated to ${status}`); fetchOrders(); }
     setUpdatingId(null);
   };
 
   const updatePaymentStatus = async (id: string, status: string) => {
     const { error } = await supabase.from("orders").update({ payment_status: status, updated_at: new Date().toISOString() }).eq("id", id);
-    if (error) {
-      toast.error("Failed to update payment status");
-    } else {
-      toast.success(`Payment status updated to ${status}`);
-      fetchOrders();
-    }
+    if (error) toast.error("Failed to update payment status");
+    else { toast.success(`Payment status updated to ${status}`); fetchOrders(); }
   };
 
-  const filtered = orders.filter((o) => {
+  const trashOrders = async (ids: string[]) => {
+    const { error } = await supabase.from("orders").update({ trashed_at: new Date().toISOString() }).in("id", ids);
+    if (error) toast.error("Failed to move to trash");
+    else { toast.success(`${ids.length} order(s) moved to trash`); setSelectedIds(new Set()); fetchOrders(); }
+  };
+
+  const restoreOrders = async (ids: string[]) => {
+    const { error } = await supabase.from("orders").update({ trashed_at: null }).in("id", ids);
+    if (error) toast.error("Failed to restore");
+    else { toast.success(`${ids.length} order(s) restored`); setSelectedIds(new Set()); fetchOrders(); }
+  };
+
+  const filtered = currentOrders.filter((o) => {
     const addr = o.shipping_address as any;
     const matchSearch =
       o.order_number.toLowerCase().includes(search.toLowerCase()) ||
@@ -58,6 +73,19 @@ const AdminOrders = () => {
     const matchStatus = statusFilter === "all" || o.order_status === statusFilter;
     return matchSearch && matchStatus;
   });
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const toggleAll = () => {
+    if (selectedIds.size === filtered.length) setSelectedIds(new Set());
+    else setSelectedIds(new Set(filtered.map(o => o.id)));
+  };
 
   const statusBadge = (s: string) => {
     const map: Record<string, string> = {
@@ -90,9 +118,19 @@ const AdminOrders = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Order Management</h1>
-          <p className="text-sm text-muted-foreground">View all orders and manage them ({orders.length} total)</p>
+          <p className="text-sm text-muted-foreground">{orders.length} total orders ({trashedOrders.length} trashed)</p>
         </div>
+        <Button onClick={() => setCreateOpen(true)} className="gap-2">
+          <Plus className="h-4 w-4" />Create Order
+        </Button>
       </div>
+
+      <Tabs value={tab} onValueChange={(v) => { setTab(v); setSelectedIds(new Set()); }}>
+        <TabsList>
+          <TabsTrigger value="active">Active ({activeOrders.length})</TabsTrigger>
+          <TabsTrigger value="trash">Trash ({trashedOrders.length})</TabsTrigger>
+        </TabsList>
+      </Tabs>
 
       <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
@@ -110,10 +148,26 @@ const AdminOrders = () => {
         </Select>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 p-3 bg-secondary rounded-lg">
+          <span className="text-sm font-medium">{selectedIds.size} selected</span>
+          {tab === "active" ? (
+            <Button size="sm" variant="destructive" onClick={() => trashOrders(Array.from(selectedIds))}>
+              <Trash2 className="h-4 w-4 mr-1" />Move to Trash
+            </Button>
+          ) : (
+            <Button size="sm" variant="outline" onClick={() => restoreOrders(Array.from(selectedIds))}>
+              <Undo2 className="h-4 w-4 mr-1" />Restore
+            </Button>
+          )}
+        </div>
+      )}
+
       <Card className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b bg-secondary/50">
+              <th className="p-3 w-10"><Checkbox checked={filtered.length > 0 && selectedIds.size === filtered.length} onCheckedChange={toggleAll} /></th>
               <th className="text-left p-3 font-medium">Order</th>
               <th className="text-left p-3 font-medium">Customer</th>
               <th className="text-left p-3 font-medium">Items</th>
@@ -130,6 +184,7 @@ const AdminOrders = () => {
               const items = Array.isArray(o.items) ? o.items : [];
               return (
                 <tr key={o.id} className="border-b hover:bg-secondary/30 transition-colors">
+                  <td className="p-3"><Checkbox checked={selectedIds.has(o.id)} onCheckedChange={() => toggleSelect(o.id)} /></td>
                   <td className="p-3 font-mono font-medium text-sm">{o.order_number}</td>
                   <td className="p-3">
                     <div>
@@ -140,14 +195,8 @@ const AdminOrders = () => {
                   <td className="p-3 text-center">{totalItems(items)} items</td>
                   <td className="p-3 font-semibold">৳{Number(o.total).toLocaleString()}</td>
                   <td className="p-3">
-                    <Select
-                      value={o.order_status}
-                      onValueChange={(val) => updateOrderStatus(o.id, val)}
-                      disabled={updatingId === o.id}
-                    >
-                      <SelectTrigger className={`h-7 text-xs w-28 border ${statusBadge(o.order_status)} rounded-full`}>
-                        <SelectValue />
-                      </SelectTrigger>
+                    <Select value={o.order_status} onValueChange={(val) => updateOrderStatus(o.id, val)} disabled={updatingId === o.id || tab === "trash"}>
+                      <SelectTrigger className={`h-7 text-xs w-28 border ${statusBadge(o.order_status)} rounded-full`}><SelectValue /></SelectTrigger>
                       <SelectContent>
                         {STATUS_OPTIONS.map((s) => (
                           <SelectItem key={s} value={s} className="capitalize text-xs">{s}</SelectItem>
@@ -156,9 +205,7 @@ const AdminOrders = () => {
                     </Select>
                   </td>
                   <td className="p-3">
-                    <Badge variant="outline" className={`text-xs capitalize ${paymentBadge(o.payment_status)}`}>
-                      {o.payment_status}
-                    </Badge>
+                    <Badge variant="outline" className={`text-xs capitalize ${paymentBadge(o.payment_status)}`}>{o.payment_status}</Badge>
                   </td>
                   <td className="p-3 text-muted-foreground text-xs whitespace-nowrap">
                     {new Date(o.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
@@ -169,16 +216,25 @@ const AdminOrders = () => {
                         <Button size="sm" variant="ghost"><MoreHorizontal className="h-4 w-4" /></Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setSelectedOrder(o)}>
-                          <Eye className="h-4 w-4 mr-2" />View Details
-                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setSelectedOrder(o)}><Eye className="h-4 w-4 mr-2" />View Details</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => updatePaymentStatus(o.id, "paid")}>
-                          <CreditCardIcon className="h-4 w-4 mr-2" />Mark Paid
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => updateOrderStatus(o.id, "cancelled")} className="text-destructive">
-                          <Ban className="h-4 w-4 mr-2" />Cancel Order
-                        </DropdownMenuItem>
+                        {tab === "active" ? (
+                          <>
+                            <DropdownMenuItem onClick={() => updatePaymentStatus(o.id, "paid")}>
+                              <CreditCardIcon className="h-4 w-4 mr-2" />Mark Paid
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => updateOrderStatus(o.id, "cancelled")} className="text-destructive">
+                              <Ban className="h-4 w-4 mr-2" />Cancel Order
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => trashOrders([o.id])} className="text-destructive">
+                              <Trash2 className="h-4 w-4 mr-2" />Move to Trash
+                            </DropdownMenuItem>
+                          </>
+                        ) : (
+                          <DropdownMenuItem onClick={() => restoreOrders([o.id])}>
+                            <Undo2 className="h-4 w-4 mr-2" />Restore
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </td>
@@ -186,7 +242,7 @@ const AdminOrders = () => {
               );
             })}
             {filtered.length === 0 && (
-              <tr><td colSpan={8} className="p-8 text-center text-muted-foreground">No orders found</td></tr>
+              <tr><td colSpan={9} className="p-8 text-center text-muted-foreground">{tab === "trash" ? "Trash is empty" : "No orders found"}</td></tr>
             )}
           </tbody>
         </table>
@@ -199,24 +255,11 @@ const AdminOrders = () => {
           {selectedOrder && (
             <div className="space-y-4 text-sm">
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <span className="text-muted-foreground text-xs">Status</span>
-                  <p className="font-medium capitalize">{selectedOrder.order_status}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground text-xs">Payment</span>
-                  <p className="font-medium capitalize">{selectedOrder.payment_method} ({selectedOrder.payment_status})</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground text-xs">Date</span>
-                  <p className="font-medium">{new Date(selectedOrder.created_at).toLocaleString()}</p>
-                </div>
-                <div>
-                  <span className="text-muted-foreground text-xs">Total</span>
-                  <p className="font-bold text-accent text-lg">৳{Number(selectedOrder.total).toLocaleString()}</p>
-                </div>
+                <div><span className="text-muted-foreground text-xs">Status</span><p className="font-medium capitalize">{selectedOrder.order_status}</p></div>
+                <div><span className="text-muted-foreground text-xs">Payment</span><p className="font-medium capitalize">{selectedOrder.payment_method} ({selectedOrder.payment_status})</p></div>
+                <div><span className="text-muted-foreground text-xs">Date</span><p className="font-medium">{new Date(selectedOrder.created_at).toLocaleString()}</p></div>
+                <div><span className="text-muted-foreground text-xs">Total</span><p className="font-bold text-accent text-lg">৳{Number(selectedOrder.total).toLocaleString()}</p></div>
               </div>
-
               <div className="border-t pt-3">
                 <h4 className="font-medium mb-2">Order Items</h4>
                 {(selectedOrder.items as any[]).map((item: any, i: number) => (
@@ -225,49 +268,34 @@ const AdminOrders = () => {
                     <span className="font-medium">৳{(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                 ))}
-                <div className="flex justify-between pt-2 font-semibold">
-                  <span>Delivery</span>
-                  <span>৳{Number(selectedOrder.delivery_charge).toLocaleString()}</span>
-                </div>
+                <div className="flex justify-between pt-2 font-semibold"><span>Delivery</span><span>৳{Number(selectedOrder.delivery_charge).toLocaleString()}</span></div>
               </div>
-
               <div className="border-t pt-3">
                 <h4 className="font-medium mb-2">Shipping Address</h4>
                 <p className="font-medium">{(selectedOrder.shipping_address as any)?.name}</p>
                 <p className="text-muted-foreground">{(selectedOrder.shipping_address as any)?.address}, {(selectedOrder.shipping_address as any)?.city}</p>
                 <p className="text-muted-foreground">{selectedOrder.guest_phone}</p>
               </div>
-
               {selectedOrder.notes && (
-                <div className="border-t pt-3">
-                  <h4 className="font-medium mb-1">Notes</h4>
-                  <p className="text-muted-foreground">{selectedOrder.notes}</p>
-                </div>
+                <div className="border-t pt-3"><h4 className="font-medium mb-1">Notes</h4><p className="text-muted-foreground">{selectedOrder.notes}</p></div>
               )}
-
-              {/* Quick actions */}
               <div className="border-t pt-3 flex gap-2">
                 <Select value={selectedOrder.order_status} onValueChange={(val) => { updateOrderStatus(selectedOrder.id, val); setSelectedOrder({ ...selectedOrder, order_status: val }); }}>
                   <SelectTrigger className="flex-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {STATUS_OPTIONS.map((s) => (
-                      <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
-                    ))}
-                  </SelectContent>
+                  <SelectContent>{STATUS_OPTIONS.map((s) => (<SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>))}</SelectContent>
                 </Select>
                 <Select value={selectedOrder.payment_status} onValueChange={(val) => { updatePaymentStatus(selectedOrder.id, val); setSelectedOrder({ ...selectedOrder, payment_status: val }); }}>
                   <SelectTrigger className="flex-1"><SelectValue /></SelectTrigger>
-                  <SelectContent>
-                    {PAYMENT_STATUS_OPTIONS.map((s) => (
-                      <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
-                    ))}
-                  </SelectContent>
+                  <SelectContent>{PAYMENT_STATUS_OPTIONS.map((s) => (<SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>))}</SelectContent>
                 </Select>
               </div>
             </div>
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Create Order Dialog */}
+      <AdminCreateOrder open={createOpen} onOpenChange={setCreateOpen} onCreated={fetchOrders} />
     </div>
   );
 };
