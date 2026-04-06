@@ -1,15 +1,39 @@
+import { useState, useEffect } from "react";
 import { Star, Quote } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
 
-const reviews = [
-  { name: "Rafiq Ahmed", rating: 5, comment: "Amazing quality headphones! Sound is crystal clear. Delivery was super fast to Dhaka.", avatar: "R" },
-  { name: "Tasnia Islam", rating: 5, comment: "Best smartwatch at this price. Battery lasts 5 days easily. Very happy with the purchase!", avatar: "T" },
-  { name: "Kamal Hossain", rating: 4, comment: "Good product, packaging was excellent. Customer support helped with setup. Highly recommended.", avatar: "K" },
-  { name: "Nusrat Jahan", rating: 5, comment: "Ordered a keyboard and mouse combo. Both are premium quality. Will definitely order again!", avatar: "N" },
+interface ReviewItem {
+  name: string;
+  rating: number;
+  comment: string;
+}
+
+const defaultReviews: ReviewItem[] = [
+  { name: "Rafiq Ahmed", rating: 5, comment: "Amazing quality headphones! Sound is crystal clear. Delivery was super fast to Dhaka." },
+  { name: "Tasnia Islam", rating: 5, comment: "Best smartwatch at this price. Battery lasts 5 days easily. Very happy with the purchase!" },
+  { name: "Kamal Hossain", rating: 4, comment: "Good product, packaging was excellent. Customer support helped with setup. Highly recommended." },
+  { name: "Nusrat Jahan", rating: 5, comment: "Ordered a keyboard and mouse combo. Both are premium quality. Will definitely order again!" },
 ];
 
 const CustomerReviews = () => {
+  const [reviews, setReviews] = useState<ReviewItem[]>(defaultReviews);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "homepage_reviews")
+        .single();
+      if (data?.value && Array.isArray(data.value)) {
+        setReviews(data.value as unknown as ReviewItem[]);
+      }
+    };
+    fetch();
+  }, []);
+
   return (
     <section className="py-12 sm:py-16 bg-secondary/50">
       <div className="container">
@@ -37,7 +61,7 @@ const CustomerReviews = () => {
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-9 h-9 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-semibold">
-                      {review.avatar}
+                      {review.name.charAt(0)}
                     </div>
                     <span className="font-medium text-sm">{review.name}</span>
                   </div>
