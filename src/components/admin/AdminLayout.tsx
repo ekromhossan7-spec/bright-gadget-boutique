@@ -40,8 +40,6 @@ const productNav = {
 };
 
 const bottomNav = [
-  { title: "Incomplete Orders", url: "/admin/incomplete-orders", icon: AlertTriangle },
-  { title: "Recovery Analytics", url: "/admin/recovery-analytics", icon: Activity },
   { title: "Pages", url: "/admin/pages", icon: FileText },
   { title: "Reports", url: "/admin/reports", icon: BarChart3 },
   { title: "Settings", url: "/admin/settings", icon: Settings },
