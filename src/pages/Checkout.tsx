@@ -22,7 +22,8 @@ const Checkout = () => {
     name: "", email: "", phone: "", address: "", city: "", area: "", notes: "",
   });
 
-  const deliveryCharge = totalPrice >= 5000 ? 0 : 120;
+  const [shippingZone, setShippingZone] = useState("inside_dhaka");
+  const deliveryCharge = totalPrice >= 5000 ? 0 : shippingZone === "inside_dhaka" ? 60 : 120;
   const partialPayment = paymentMethod === "partial" ? Math.ceil((totalPrice + deliveryCharge) * 0.1) : 0;
   const grandTotal = totalPrice + deliveryCharge;
 
