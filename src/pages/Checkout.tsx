@@ -160,8 +160,8 @@ const Checkout = () => {
                     <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-secondary/50">
                       <RadioGroupItem value="partial" id="partial" />
                       <Label htmlFor="partial" className="cursor-pointer flex-1">
-                        <span className="font-medium">Online Partial Payment (10%)</span>
-                        <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * 0.1).toLocaleString()} now, rest on delivery</p>
+                         <span className="font-medium">Online Partial Payment (5%)</span>
+                        <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * 0.05).toLocaleString()} now, rest on delivery</p>
                       </Label>
                     </div>
                   </RadioGroup>
