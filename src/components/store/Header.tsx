@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ShoppingCart, User, Search, Menu, X, Heart, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,9 +9,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useIsAdmin } from "@/hooks/use-admin";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import logo from "@/assets/logo.png";
+import { supabase } from "@/integrations/supabase/client";
+import defaultLogo from "@/assets/logo.png";
 
-const navLinks = [
+interface NavLink {
+  label: string;
+  href: string;
+}
+
+const defaultNavLinks: NavLink[] = [
   { label: "Home", href: "/" },
   { label: "Shop", href: "/shop" },
   { label: "About", href: "/about" },
@@ -24,6 +30,28 @@ const Header = () => {
   const { user } = useAuth();
   const isAdmin = useIsAdmin();
   const [searchOpen, setSearchOpen] = useState(false);
+  const [storeName, setStoreName] = useState("Techllect");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [navLinks, setNavLinks] = useState<NavLink[]>(defaultNavLinks);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("key, value")
+        .in("key", ["header_store_name", "header_logo", "header_nav_links"]);
+      if (data) {
+        data.forEach((row) => {
+          if (row.key === "header_store_name" && typeof row.value === "string") setStoreName(row.value);
+          if (row.key === "header_logo" && typeof row.value === "string" && row.value) setLogoUrl(row.value);
+          if (row.key === "header_nav_links" && Array.isArray(row.value)) setNavLinks(row.value as unknown as NavLink[]);
+        });
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const logo = logoUrl || defaultLogo;
 
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 border-b">
@@ -50,8 +78,8 @@ const Header = () => {
         </Sheet>
 
         <Link to="/" className="flex items-center gap-2">
-          <img src={logo} alt="Techllect" className="h-10 w-10 rounded-full object-cover border-2 border-accent" />
-          <span className="font-display font-bold text-xl tracking-tight hidden sm:inline">Techllect</span>
+          <img src={logo} alt={storeName} className="h-10 w-10 rounded-full object-cover border-2 border-accent" />
+          <span className="font-display font-bold text-xl tracking-tight hidden sm:inline">{storeName}</span>
         </Link>
 
         <nav className="hidden lg:flex items-center gap-8">
