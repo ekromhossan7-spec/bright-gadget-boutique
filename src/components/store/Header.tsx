@@ -79,6 +79,14 @@ const Header = () => {
             </Button>
           </Link>
 
+          {isAdmin && (
+            <Link to="/admin">
+              <Button variant="ghost" size="icon" className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50">
+                <Shield className="h-5 w-5" />
+              </Button>
+            </Link>
+          )}
+
           <Link to={user ? "/account" : "/login"}>
             <Button variant="ghost" size="icon"><User className="h-5 w-5" /></Button>
           </Link>
