@@ -357,7 +357,7 @@ const AdminOrders = () => {
               );
             })}
             {filtered.length === 0 && (
-              <tr><td colSpan={10} className="p-8 text-center text-muted-foreground">{tab === "trash" ? "Trash is empty" : "No orders found"}</td></tr>
+              <tr><td colSpan={11} className="p-8 text-center text-muted-foreground">{tab === "trash" ? "Trash is empty" : "No orders found"}</td></tr>
             )}
           </tbody>
         </table>
