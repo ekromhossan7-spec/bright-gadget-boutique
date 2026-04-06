@@ -1,4 +1,7 @@
-const announcements = [
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+const defaultAnnouncements = [
   "🚚 Free shipping on orders over ৳5,000",
   "🔥 Flash Sale — Up to 50% off on selected gadgets",
   "📦 Cash on Delivery available nationwide",
@@ -6,6 +9,22 @@ const announcements = [
 ];
 
 const TopBar = () => {
+  const [announcements, setAnnouncements] = useState<string[]>(defaultAnnouncements);
+
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "top_bar_announcements")
+        .single();
+      if (data?.value && Array.isArray(data.value) && data.value.length > 0) {
+        setAnnouncements(data.value as string[]);
+      }
+    };
+    fetchAnnouncements();
+  }, []);
+
   return (
     <div className="bg-primary text-primary-foreground py-2 overflow-hidden">
       <div className="flex animate-slide-left whitespace-nowrap">

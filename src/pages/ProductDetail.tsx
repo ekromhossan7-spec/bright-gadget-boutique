@@ -149,7 +149,7 @@ const ProductDetail = () => {
 
               {/* Trust badges */}
               <div className="grid grid-cols-3 gap-3 pt-4 border-t">
-                <div className="text-center"><Truck className="h-5 w-5 mx-auto text-accent mb-1" /><span className="text-xs text-muted-foreground">Free Shipping</span></div>
+                <div className="text-center"><Truck className="h-5 w-5 mx-auto text-accent mb-1" /><span className="text-xs text-muted-foreground">Shipping</span></div>
                 <div className="text-center"><ShieldCheck className="h-5 w-5 mx-auto text-accent mb-1" /><span className="text-xs text-muted-foreground">Genuine Product</span></div>
                 <div className="text-center"><RotateCcw className="h-5 w-5 mx-auto text-accent mb-1" /><span className="text-xs text-muted-foreground">Easy Returns</span></div>
               </div>

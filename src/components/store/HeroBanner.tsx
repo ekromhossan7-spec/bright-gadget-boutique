@@ -1,9 +1,29 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, ShieldCheck, Truck, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+
+const defaultHeroImage = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop&q=80";
 
 const HeroBanner = () => {
+  const [heroImage, setHeroImage] = useState(defaultHeroImage);
+
+  useEffect(() => {
+    const fetchHeroImage = async () => {
+      const { data } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "hero_image")
+        .single();
+      if (data?.value && typeof data.value === "string") {
+        setHeroImage(data.value);
+      }
+    };
+    fetchHeroImage();
+  }, []);
+
   return (
     <section className="relative bg-secondary/50 overflow-hidden min-h-[85vh] flex items-center">
       {/* Decorative blobs */}
@@ -78,7 +98,7 @@ const HeroBanner = () => {
 
               <div className="absolute inset-12 rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 bg-background border">
                 <img
-                  src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop&q=80"
+                  src={heroImage}
                   alt="Premium tech gadgets"
                   className="w-full h-full object-cover"
                 />
