@@ -28,7 +28,6 @@ const AdminProducts = () => {
   const [editProduct, setEditProduct] = useState<any>(null);
   const [isNew, setIsNew] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [imageInput, setImageInput] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
 
   const fetchData = async () => {
