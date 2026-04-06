@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import TopBar from "@/components/store/TopBar";
 import Header from "@/components/store/Header";
 import Footer from "@/components/store/Footer";
@@ -8,80 +9,62 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Slider } from "@/components/ui/slider";
-
-const allProducts = [
-  { id: "1", name: "Wireless Noise Cancelling Headphones Pro", slug: "wireless-headphones-pro", price: 4999, comparePrice: 7999, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80", category: "headphones", brand: "SoundMax" },
-  { id: "2", name: "Smart Watch Ultra Series 3", slug: "smart-watch-ultra-3", price: 8999, comparePrice: 12999, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop&q=80", category: "smartwatches", brand: "TechFit" },
-  { id: "3", name: "Portable Bluetooth Speaker 360°", slug: "bluetooth-speaker-360", price: 2499, comparePrice: 3999, image: "https://images.unsplash.com/photo-1589003077984-894e133dabab?w=400&h=400&fit=crop&q=80", category: "headphones", brand: "SoundMax" },
-  { id: "4", name: "USB-C Fast Charging Hub 7-in-1", slug: "usbc-charging-hub", price: 1999, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=400&fit=crop&q=80", category: "laptops", brand: "ChargePro" },
-  { id: "5", name: "Mechanical Gaming Keyboard RGB", slug: "mechanical-keyboard-rgb", price: 5499, comparePrice: 7499, image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&h=400&fit=crop&q=80", category: "gaming", brand: "GameZone" },
-  { id: "6", name: "Wireless Ergonomic Mouse", slug: "wireless-ergonomic-mouse", price: 1299, comparePrice: 1999, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=400&fit=crop&q=80", category: "laptops", brand: "ErgoTech" },
-  { id: "7", name: "4K Action Camera Waterproof", slug: "4k-action-camera", price: 6999, comparePrice: 9999, image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400&h=400&fit=crop&q=80", category: "cameras", brand: "ActionPro" },
-  { id: "8", name: "TWS Earbuds with ANC", slug: "tws-earbuds-anc", price: 3499, comparePrice: 4999, image: "https://images.unsplash.com/photo-1590658268037-6bf12f032f55?w=400&h=400&fit=crop&q=80", category: "headphones", brand: "SoundMax" },
-  { id: "9", name: "Wireless Charging Pad 15W", slug: "wireless-charging-pad", price: 999, comparePrice: 1499, image: "https://images.unsplash.com/photo-1586953208270-767889fa9b0e?w=400&h=400&fit=crop&q=80", category: "smartphones", brand: "ChargePro" },
-  { id: "10", name: "Smart LED Desk Lamp", slug: "smart-led-desk-lamp", price: 2299, image: "https://images.unsplash.com/photo-1544457070-4cd773b4d71e?w=400&h=400&fit=crop&q=80", category: "laptops", brand: "LumiTech" },
-  { id: "11", name: "Laptop Stand Aluminum", slug: "laptop-stand-aluminum", price: 1799, comparePrice: 2499, image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=400&h=400&fit=crop&q=80", category: "laptops", brand: "ErgoTech" },
-  { id: "12", name: "Power Bank 20000mAh", slug: "power-bank-20000", price: 1599, comparePrice: 2299, image: "https://images.unsplash.com/photo-1609091839311-d5365f9ff1c5?w=400&h=400&fit=crop&q=80", category: "smartphones", brand: "ChargePro" },
-  { id: "13", name: "Webcam HD 1080p", slug: "webcam-hd-1080p", price: 2999, image: "https://images.unsplash.com/photo-1587826080692-f439cd0b70da?w=400&h=400&fit=crop&q=80", category: "cameras", brand: "ActionPro" },
-  { id: "14", name: "USB Microphone Studio", slug: "usb-microphone-studio", price: 3499, comparePrice: 4999, image: "https://images.unsplash.com/photo-1598550476439-6847785fcea6?w=400&h=400&fit=crop&q=80", category: "gaming", brand: "GameZone" },
-  { id: "15", name: "Smart Plug Wi-Fi", slug: "smart-plug-wifi", price: 699, image: "https://images.unsplash.com/photo-1544457070-4cd773b4d71e?w=400&h=400&fit=crop&q=80", category: "smartphones", brand: "LumiTech" },
-  { id: "16", name: "VR Headset Lite", slug: "vr-headset-lite", price: 7999, comparePrice: 9999, image: "https://images.unsplash.com/photo-1622979135225-d2ba269cf1ac?w=400&h=400&fit=crop&q=80", category: "gaming", brand: "GameZone" },
-];
-
-const categories = [
-  { slug: "all", name: "All" },
-  { slug: "headphones", name: "Headphones" },
-  { slug: "smartphones", name: "Smartphones" },
-  { slug: "smartwatches", name: "Smartwatches" },
-  { slug: "laptops", name: "Laptops" },
-  { slug: "cameras", name: "Cameras" },
-  { slug: "gaming", name: "Gaming" },
-];
-
-const brands = [...new Set(allProducts.map((p) => p.brand))].sort();
+import { Skeleton } from "@/components/ui/skeleton";
 
 const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get("category") || "all";
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("default");
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 15000]);
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
   const [showFilters, setShowFilters] = useState(false);
 
-  const toggleBrand = (brand: string) => {
-    setSelectedBrands((prev) =>
-      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
-    );
-  };
+  const [products, setProducts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      const [prodRes, catRes] = await Promise.all([
+        supabase.from("products").select("*, categories(name, slug)").order("created_at", { ascending: false }),
+        supabase.from("categories").select("*").order("sort_order"),
+      ]);
+      if (prodRes.data) setProducts(prodRes.data);
+      if (catRes.data) setCategories(catRes.data);
+      setLoading(false);
+    };
+    fetchData();
+  }, []);
+
+  const maxPrice = useMemo(() => {
+    if (products.length === 0) return 100000;
+    return Math.max(...products.map((p) => p.price));
+  }, [products]);
 
   const filtered = useMemo(() => {
-    let products = allProducts;
+    let result = products;
     if (activeCategory !== "all") {
-      products = products.filter((p) => p.category === activeCategory);
+      result = result.filter((p: any) => p.categories?.slug === activeCategory);
     }
     if (search) {
-      products = products.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
+      result = result.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
     }
-    products = products.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
-    if (selectedBrands.length > 0) {
-      products = products.filter((p) => selectedBrands.includes(p.brand));
-    }
-    if (sortBy === "price-low") products = [...products].sort((a, b) => a.price - b.price);
-    if (sortBy === "price-high") products = [...products].sort((a, b) => b.price - a.price);
-    return products;
-  }, [activeCategory, search, sortBy, priceRange, selectedBrands]);
+    result = result.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    if (sortBy === "price-low") result = [...result].sort((a, b) => a.price - b.price);
+    if (sortBy === "price-high") result = [...result].sort((a, b) => b.price - a.price);
+    return result;
+  }, [activeCategory, search, sortBy, priceRange, products]);
 
   const clearFilters = () => {
-    setPriceRange([0, 15000]);
-    setSelectedBrands([]);
+    setPriceRange([0, maxPrice]);
     setSearch("");
     setSortBy("default");
     searchParams.delete("category");
     setSearchParams(searchParams);
   };
 
-  const hasActiveFilters = selectedBrands.length > 0 || priceRange[0] > 0 || priceRange[1] < 15000;
+  const hasActiveFilters = priceRange[0] > 0 || priceRange[1] < maxPrice;
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -125,39 +108,19 @@ const Shop = () => {
                   </Button>
                 )}
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                {/* Price Range */}
-                <div>
-                  <p className="text-sm font-medium mb-3">Price Range</p>
-                  <Slider
-                    min={0}
-                    max={15000}
-                    step={100}
-                    value={priceRange}
-                    onValueChange={(val) => setPriceRange(val as [number, number])}
-                    className="mb-2"
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>৳{priceRange[0].toLocaleString()}</span>
-                    <span>৳{priceRange[1].toLocaleString()}</span>
-                  </div>
-                </div>
-                {/* Brand */}
-                <div>
-                  <p className="text-sm font-medium mb-3">Brand</p>
-                  <div className="flex flex-wrap gap-2">
-                    {brands.map((brand) => (
-                      <Button
-                        key={brand}
-                        variant={selectedBrands.includes(brand) ? "default" : "outline"}
-                        size="sm"
-                        className="rounded-full text-xs"
-                        onClick={() => toggleBrand(brand)}
-                      >
-                        {brand}
-                      </Button>
-                    ))}
-                  </div>
+              <div>
+                <p className="text-sm font-medium mb-3">Price Range</p>
+                <Slider
+                  min={0}
+                  max={maxPrice}
+                  step={100}
+                  value={priceRange}
+                  onValueChange={(val) => setPriceRange(val as [number, number])}
+                  className="mb-2"
+                />
+                <div className="flex justify-between text-xs text-muted-foreground">
+                  <span>৳{priceRange[0].toLocaleString()}</span>
+                  <span>৳{priceRange[1].toLocaleString()}</span>
                 </div>
               </div>
             </div>
@@ -165,20 +128,21 @@ const Shop = () => {
 
           {/* Category tabs */}
           <div className="flex flex-wrap gap-2 mb-8">
+            <Button
+              variant={activeCategory === "all" ? "default" : "outline"}
+              size="sm"
+              className="rounded-full"
+              onClick={() => { searchParams.delete("category"); setSearchParams(searchParams); }}
+            >
+              All
+            </Button>
             {categories.map((cat) => (
               <Button
-                key={cat.slug}
+                key={cat.id}
                 variant={activeCategory === cat.slug ? "default" : "outline"}
                 size="sm"
                 className="rounded-full"
-                onClick={() => {
-                  if (cat.slug === "all") {
-                    searchParams.delete("category");
-                  } else {
-                    searchParams.set("category", cat.slug);
-                  }
-                  setSearchParams(searchParams);
-                }}
+                onClick={() => { searchParams.set("category", cat.slug); setSearchParams(searchParams); }}
               >
                 {cat.name}
               </Button>
@@ -186,10 +150,20 @@ const Shop = () => {
           </div>
 
           {/* Products grid */}
-          {filtered.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              {Array.from({ length: 8 }).map((_, i) => (
+                <div key={i} className="space-y-3">
+                  <Skeleton className="aspect-square rounded-2xl" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
             <div className="text-center py-20">
               <p className="text-muted-foreground text-lg">No products found</p>
-              {hasActiveFilters && (
+              {(hasActiveFilters || activeCategory !== "all") && (
                 <Button variant="outline" className="mt-4 rounded-full" onClick={clearFilters}>
                   Clear Filters
                 </Button>
@@ -198,7 +172,15 @@ const Shop = () => {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
               {filtered.map((product) => (
-                <ProductCard key={product.id} {...product} />
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  slug={product.slug}
+                  price={product.price}
+                  comparePrice={product.compare_price}
+                  image={product.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80"}
+                />
               ))}
             </div>
           )}
