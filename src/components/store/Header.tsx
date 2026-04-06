@@ -40,6 +40,11 @@ const Header = () => {
               <hr />
               <Link to="/wishlist" className="text-lg font-medium hover:text-accent">Wishlist</Link>
               <Link to={user ? "/account" : "/login"} className="text-lg font-medium hover:text-accent">{user ? "My Account" : "Login"}</Link>
+              {isAdmin && (
+                <Link to="/admin" className="text-lg font-medium text-emerald-600 hover:text-emerald-700 flex items-center gap-2">
+                  <Shield className="h-5 w-5" />Admin Panel
+                </Link>
+              )}
             </div>
           </SheetContent>
         </Sheet>
