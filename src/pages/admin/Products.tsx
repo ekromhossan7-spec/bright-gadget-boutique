@@ -197,22 +197,10 @@ const AdminProducts = () => {
               {/* Images */}
               <div>
                 <Label>Images</Label>
-                <div className="flex gap-2 mt-1">
-                  <Input placeholder="Paste image URL..." value={imageInput} onChange={(e) => setImageInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addImage())} />
-                  <Button type="button" variant="outline" onClick={addImage}>Add</Button>
-                </div>
-                {(editProduct.images || []).length > 0 && (
-                  <div className="flex gap-2 mt-2 flex-wrap">
-                    {editProduct.images.map((img: string, i: number) => (
-                      <div key={i} className="relative group">
-                        <img src={img} alt="" className="w-16 h-16 rounded-lg object-cover border" />
-                        <button onClick={() => removeImage(i)} className="absolute -top-1 -right-1 w-5 h-5 bg-destructive text-destructive-foreground rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity">
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                <ImageUpload
+                  images={editProduct.images || []}
+                  onChange={(imgs) => setEditProduct({ ...editProduct, images: imgs })}
+                />
               </div>
 
               {/* Toggles */}
