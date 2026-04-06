@@ -90,6 +90,8 @@ const App = () => (
                   <Route path="shipping" element={<AdminShipping />} />
                   <Route path="pages" element={<AdminPages />} />
                   <Route path="categories" element={<AdminCategories />} />
+                  <Route path="incomplete-orders" element={<AdminIncompleteOrders />} />
+                  <Route path="recovery-analytics" element={<AdminRecoveryAnalytics />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
