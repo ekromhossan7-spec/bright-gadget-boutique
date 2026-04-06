@@ -64,6 +64,20 @@ const AdminOrders = () => {
     else { toast.success(`${ids.length} order(s) restored`); setSelectedIds(new Set()); fetchOrders(); }
   };
 
+  const bulkUpdateStatus = async (status: string) => {
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from("orders").update({ order_status: status, updated_at: new Date().toISOString() }).in("id", ids);
+    if (error) toast.error("Failed to update status");
+    else { toast.success(`${ids.length} order(s) updated to ${status}`); setSelectedIds(new Set()); fetchOrders(); }
+  };
+
+  const bulkUpdatePayment = async (status: string) => {
+    const ids = Array.from(selectedIds);
+    const { error } = await supabase.from("orders").update({ payment_status: status, updated_at: new Date().toISOString() }).in("id", ids);
+    if (error) toast.error("Failed to update payment");
+    else { toast.success(`${ids.length} order(s) payment updated to ${status}`); setSelectedIds(new Set()); fetchOrders(); }
+  };
+
   const filtered = currentOrders.filter((o) => {
     const addr = o.shipping_address as any;
     const matchSearch =
