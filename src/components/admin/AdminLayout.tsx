@@ -21,6 +21,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 const mainNav = [
   { title: "Dashboard", url: "/admin", icon: LayoutDashboard },
   { title: "Orders", url: "/admin/orders", icon: ShoppingCart },
+  { title: "Incomplete Orders", url: "/admin/incomplete-orders", icon: AlertTriangle },
+  { title: "Recovery Analytics", url: "/admin/recovery-analytics", icon: Activity },
   { title: "Payments", url: "/admin/payments", icon: CreditCard },
   { title: "Customers", url: "/admin/customers", icon: Users },
 ];
