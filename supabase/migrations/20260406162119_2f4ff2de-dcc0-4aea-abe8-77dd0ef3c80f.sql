@@ -1,0 +1,1 @@
+ALTER TABLE public.orders ADD COLUMN trashed_at timestamp with time zone DEFAULT null;
