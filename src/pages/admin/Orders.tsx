@@ -258,9 +258,14 @@ const AdminOrders = () => {
             </>
           )}
           {tab === "trash" && (
-            <Button size="sm" variant="outline" onClick={() => restoreOrders(Array.from(selectedIds))}>
-              <Undo2 className="h-4 w-4 mr-1" />Restore
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button size="sm" variant="outline" onClick={() => restoreOrders(Array.from(selectedIds))}>
+                <Undo2 className="h-4 w-4 mr-1" />Restore
+              </Button>
+              <Button size="sm" variant="destructive" onClick={() => permanentDeleteOrders(Array.from(selectedIds))}>
+                <Trash2 className="h-4 w-4 mr-1" />Delete Forever
+              </Button>
+            </div>
           )}
         </div>
       )}
