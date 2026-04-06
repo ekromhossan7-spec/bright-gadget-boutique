@@ -3,6 +3,7 @@ import { ShoppingCart, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { motion } from "framer-motion";
 
 interface ProductCardProps {
@@ -17,7 +18,9 @@ interface ProductCardProps {
 
 const ProductCard = ({ id, name, slug, price, comparePrice, image, featured }: ProductCardProps) => {
   const { addItem } = useCart();
+  const { toggleItem, isInWishlist } = useWishlist();
   const discount = comparePrice ? Math.round(((comparePrice - price) / comparePrice) * 100) : 0;
+  const wishlisted = isInWishlist(id);
 
   return (
     <motion.div
@@ -28,21 +31,14 @@ const ProductCard = ({ id, name, slug, price, comparePrice, image, featured }: P
       className="group relative bg-card rounded-2xl border overflow-hidden hover:shadow-lg transition-shadow"
     >
       {discount > 0 && (
-        <Badge className="absolute top-3 left-3 z-10 bg-destructive text-destructive-foreground">
-          -{discount}%
-        </Badge>
+        <Badge className="absolute top-3 left-3 z-10 bg-destructive text-destructive-foreground">-{discount}%</Badge>
       )}
-      <button className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center hover:bg-background transition-colors">
-        <Heart className="h-4 w-4" />
+      <button onClick={() => toggleItem(id)} className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center hover:bg-background transition-colors ${wishlisted ? "text-destructive" : ""}`}>
+        <Heart className={`h-4 w-4 ${wishlisted ? "fill-destructive" : ""}`} />
       </button>
 
       <Link to={`/product/${slug}`} className="block aspect-square overflow-hidden bg-secondary">
-        <img
-          src={image}
-          alt={name}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-          loading="lazy"
-        />
+        <img src={image} alt={name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy" />
       </Link>
 
       <div className="p-4">
@@ -52,16 +48,9 @@ const ProductCard = ({ id, name, slug, price, comparePrice, image, featured }: P
         <div className="flex items-center justify-between">
           <div className="flex items-baseline gap-2">
             <span className="font-bold text-lg">৳{price.toLocaleString()}</span>
-            {comparePrice && (
-              <span className="text-sm text-muted-foreground line-through">৳{comparePrice.toLocaleString()}</span>
-            )}
+            {comparePrice && <span className="text-sm text-muted-foreground line-through">৳{comparePrice.toLocaleString()}</span>}
           </div>
-          <Button
-            size="icon"
-            variant="ghost"
-            className="h-9 w-9 rounded-full hover:bg-accent hover:text-accent-foreground"
-            onClick={() => addItem({ id, name, price, image, slug })}
-          >
+          <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full hover:bg-accent hover:text-accent-foreground" onClick={() => addItem({ id, name, price, image, slug })}>
             <ShoppingCart className="h-4 w-4" />
           </Button>
         </div>
