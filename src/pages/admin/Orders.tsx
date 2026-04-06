@@ -163,13 +163,32 @@ const AdminOrders = () => {
       </div>
 
       {selectedIds.size > 0 && (
-        <div className="flex items-center gap-3 p-3 bg-secondary rounded-lg">
+        <div className="flex flex-wrap items-center gap-3 p-3 bg-secondary rounded-lg">
           <span className="text-sm font-medium">{selectedIds.size} selected</span>
-          {tab === "active" ? (
-            <Button size="sm" variant="destructive" onClick={() => trashOrders(Array.from(selectedIds))}>
-              <Trash2 className="h-4 w-4 mr-1" />Move to Trash
-            </Button>
-          ) : (
+          {tab === "active" && (
+            <>
+              <Select onValueChange={bulkUpdateStatus}>
+                <SelectTrigger className="w-36 h-8 text-xs"><SelectValue placeholder="Set Status" /></SelectTrigger>
+                <SelectContent>
+                  {STATUS_OPTIONS.map((s) => (
+                    <SelectItem key={s} value={s} className="capitalize text-xs">{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select onValueChange={bulkUpdatePayment}>
+                <SelectTrigger className="w-36 h-8 text-xs"><SelectValue placeholder="Set Payment" /></SelectTrigger>
+                <SelectContent>
+                  {PAYMENT_STATUS_OPTIONS.map((s) => (
+                    <SelectItem key={s} value={s} className="capitalize text-xs">{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Button size="sm" variant="destructive" onClick={() => trashOrders(Array.from(selectedIds))}>
+                <Trash2 className="h-4 w-4 mr-1" />Move to Trash
+              </Button>
+            </>
+          )}
+          {tab === "trash" && (
             <Button size="sm" variant="outline" onClick={() => restoreOrders(Array.from(selectedIds))}>
               <Undo2 className="h-4 w-4 mr-1" />Restore
             </Button>
