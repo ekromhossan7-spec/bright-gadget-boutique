@@ -1,14 +1,14 @@
 import ProductCard from "./ProductCard";
 
 const demoProducts = [
-  { id: "1", name: "Wireless Noise Cancelling Headphones Pro", slug: "wireless-headphones-pro", price: 4999, comparePrice: 7999, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop" },
-  { id: "2", name: "Smart Watch Ultra Series 3", slug: "smart-watch-ultra-3", price: 8999, comparePrice: 12999, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop" },
-  { id: "3", name: "Portable Bluetooth Speaker 360°", slug: "bluetooth-speaker-360", price: 2499, comparePrice: 3999, image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=400&h=400&fit=crop" },
-  { id: "4", name: "USB-C Fast Charging Hub 7-in-1", slug: "usbc-charging-hub", price: 1999, image: "https://images.unsplash.com/photo-1625723044792-44de16bc5428?w=400&h=400&fit=crop" },
-  { id: "5", name: "Mechanical Gaming Keyboard RGB", slug: "mechanical-keyboard-rgb", price: 5499, comparePrice: 7499, image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&h=400&fit=crop" },
-  { id: "6", name: "Wireless Ergonomic Mouse", slug: "wireless-ergonomic-mouse", price: 1299, comparePrice: 1999, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=400&fit=crop" },
-  { id: "7", name: "4K Action Camera Waterproof", slug: "4k-action-camera", price: 6999, comparePrice: 9999, image: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=400&fit=crop" },
-  { id: "8", name: "TWS Earbuds with ANC", slug: "tws-earbuds-anc", price: 3499, comparePrice: 4999, image: "https://images.unsplash.com/photo-1590658268037-6bf12f032f55?w=400&h=400&fit=crop" },
+  { id: "1", name: "Wireless Noise Cancelling Headphones Pro", slug: "wireless-headphones-pro", price: 4999, comparePrice: 7999, image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80" },
+  { id: "2", name: "Smart Watch Ultra Series 3", slug: "smart-watch-ultra-3", price: 8999, comparePrice: 12999, image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=400&fit=crop&q=80" },
+  { id: "3", name: "Portable Bluetooth Speaker 360°", slug: "bluetooth-speaker-360", price: 2499, comparePrice: 3999, image: "https://images.unsplash.com/photo-1589003077984-894e133dabab?w=400&h=400&fit=crop&q=80" },
+  { id: "4", name: "USB-C Fast Charging Hub 7-in-1", slug: "usbc-charging-hub", price: 1999, image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=400&fit=crop&q=80" },
+  { id: "5", name: "Mechanical Gaming Keyboard RGB", slug: "mechanical-keyboard-rgb", price: 5499, comparePrice: 7499, image: "https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&h=400&fit=crop&q=80" },
+  { id: "6", name: "Wireless Ergonomic Mouse", slug: "wireless-ergonomic-mouse", price: 1299, comparePrice: 1999, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=400&h=400&fit=crop&q=80" },
+  { id: "7", name: "4K Action Camera Waterproof", slug: "4k-action-camera", price: 6999, comparePrice: 9999, image: "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?w=400&h=400&fit=crop&q=80" },
+  { id: "8", name: "TWS Earbuds with ANC", slug: "tws-earbuds-anc", price: 3499, comparePrice: 4999, image: "https://images.unsplash.com/photo-1590658268037-6bf12f032f55?w=400&h=400&fit=crop&q=80" },
 ];
 
 const FeaturedProducts = () => {

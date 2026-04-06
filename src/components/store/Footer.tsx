@@ -9,8 +9,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <img src={logo} alt="Techllect" className="h-10 w-10 object-contain" />
+            <div className="flex items-center gap-3 mb-4">
+              <img src={logo} alt="Techllect" className="h-11 w-11 rounded-full object-cover border-2 border-accent" />
               <span className="font-display font-bold text-xl">Techllect</span>
             </div>
             <p className="text-primary-foreground/60 text-sm mb-4 leading-relaxed">
@@ -44,8 +44,8 @@ const Footer = () => {
             <h3 className="font-semibold mb-4">Customer Service</h3>
             <ul className="space-y-2 text-sm text-primary-foreground/60">
               <li><Link to="/track-order" className="hover:text-accent transition-colors">Track Order</Link></li>
-              <li><Link to="/returns" className="hover:text-accent transition-colors">Return Policy</Link></li>
-              <li><Link to="/shipping" className="hover:text-accent transition-colors">Shipping Info</Link></li>
+              <li><Link to="/return-policy" className="hover:text-accent transition-colors">Return Policy</Link></li>
+              <li><Link to="/shipping-info" className="hover:text-accent transition-colors">Shipping Info</Link></li>
               <li><Link to="/faq" className="hover:text-accent transition-colors">FAQ</Link></li>
             </ul>
           </div>
@@ -74,7 +74,7 @@ const Footer = () => {
       {/* Copyright */}
       <div className="border-t border-primary-foreground/10">
         <div className="container py-4 text-center text-sm text-primary-foreground/40">
-          © {new Date().getFullYear()} Techllect. All rights reserved.
+          © {new Date().getFullYear()} Techllect. All rights reserved Ekrom Hossan (Software Developer)
         </div>
       </div>
     </footer>

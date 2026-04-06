@@ -5,8 +5,8 @@ import { motion } from "framer-motion";
 
 const HeroBanner = () => {
   return (
-    <section className="relative bg-secondary/40 overflow-hidden min-h-[85vh] flex items-center">
-      {/* Decorative blobs - increased opacity by 10% */}
+    <section className="relative bg-secondary/50 overflow-hidden min-h-[85vh] flex items-center">
+      {/* Decorative blobs */}
       <div className="absolute top-20 right-[15%] w-[500px] h-[500px] rounded-full bg-accent/15 blur-3xl pointer-events-none" />
       <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-accent/20 blur-3xl pointer-events-none" />
       <div className="absolute top-10 left-[10%] w-3 h-3 rounded-full bg-accent/50 animate-pulse" />
@@ -44,7 +44,7 @@ const HeroBanner = () => {
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full px-8">
-                <Link to="/categories">Browse Categories</Link>
+                <Link to="/shop">Browse Categories</Link>
               </Button>
             </div>
 
@@ -78,7 +78,7 @@ const HeroBanner = () => {
 
               <div className="absolute inset-12 rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 bg-background border">
                 <img
-                  src="https://images.unsplash.com/photo-1546868871-af0de0ae72be?w=500&h=500&fit=crop"
+                  src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop&q=80"
                   alt="Premium tech gadgets"
                   className="w-full h-full object-cover"
                 />
