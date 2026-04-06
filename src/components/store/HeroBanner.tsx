@@ -5,13 +5,13 @@ import { motion } from "framer-motion";
 
 const HeroBanner = () => {
   return (
-    <section className="relative bg-secondary/30 overflow-hidden min-h-[85vh] flex items-center">
-      {/* Decorative blobs */}
-      <div className="absolute top-20 right-[15%] w-[500px] h-[500px] rounded-full bg-accent/5 blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-accent/10 blur-3xl pointer-events-none" />
-      <div className="absolute top-10 left-[10%] w-3 h-3 rounded-full bg-accent/40 animate-pulse" />
-      <div className="absolute bottom-32 right-[8%] w-2 h-2 rounded-full bg-primary/30 animate-pulse delay-700" />
-      <div className="absolute top-[40%] right-[5%] w-4 h-4 rounded-full border-2 border-accent/30" />
+    <section className="relative bg-secondary/40 overflow-hidden min-h-[85vh] flex items-center">
+      {/* Decorative blobs - increased opacity by 10% */}
+      <div className="absolute top-20 right-[15%] w-[500px] h-[500px] rounded-full bg-accent/15 blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-20 -left-20 w-72 h-72 rounded-full bg-accent/20 blur-3xl pointer-events-none" />
+      <div className="absolute top-10 left-[10%] w-3 h-3 rounded-full bg-accent/50 animate-pulse" />
+      <div className="absolute bottom-32 right-[8%] w-2 h-2 rounded-full bg-primary/40 animate-pulse delay-700" />
+      <div className="absolute top-[40%] right-[5%] w-4 h-4 rounded-full border-2 border-accent/40" />
 
       <div className="container relative py-12 sm:py-16 lg:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center">
@@ -40,11 +40,11 @@ const HeroBanner = () => {
             <div className="flex flex-wrap items-center gap-4 mb-10">
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 rounded-full px-8 shadow-lg shadow-accent/25">
                 <Link to="/shop">
-                  Get Started <ArrowRight className="ml-2 h-4 w-4" />
+                  Shop Now <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="rounded-full px-8">
-                <Link to="/categories">Learn More</Link>
+                <Link to="/categories">Browse Categories</Link>
               </Button>
             </div>
 
@@ -73,16 +73,13 @@ const HeroBanner = () => {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="relative flex items-center justify-center"
           >
-            {/* Main visual circle */}
             <div className="relative w-full max-w-md mx-auto aspect-square">
-              {/* Background circle */}
-              <div className="absolute inset-4 rounded-full bg-gradient-to-br from-accent/20 via-primary/10 to-accent/5 border border-accent/10" />
+              <div className="absolute inset-4 rounded-full bg-gradient-to-br from-accent/25 via-primary/15 to-accent/10 border border-accent/15" />
 
-              {/* Center product image */}
               <div className="absolute inset-12 rounded-3xl overflow-hidden shadow-2xl shadow-primary/20 bg-background border">
                 <img
-                  src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop"
-                  alt="Premium gadgets"
+                  src="https://images.unsplash.com/photo-1546868871-af0de0ae72be?w=500&h=500&fit=crop"
+                  alt="Premium tech gadgets"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -114,7 +111,6 @@ const HeroBanner = () => {
                 <p className="text-xs text-muted-foreground">2,400+ Reviews</p>
               </motion.div>
 
-              {/* Small floating icons */}
               <motion.div
                 animate={{ y: [0, -10, 0] }}
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
