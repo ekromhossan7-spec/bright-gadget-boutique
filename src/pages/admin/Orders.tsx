@@ -12,8 +12,6 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminCreateOrder from "@/components/admin/AdminCreateOrder";
-import OrderDetailDialog from "@/components/admin/OrderDetailDialog";
-import SteadfastActions from "@/components/admin/SteadfastActions";
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
 const PAYMENT_STATUS_OPTIONS = ["pending", "partial", "paid", "refunded"] as const;
