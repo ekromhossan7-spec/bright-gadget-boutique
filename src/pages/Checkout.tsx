@@ -188,7 +188,7 @@ const Checkout = () => {
                     <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>৳{totalPrice.toLocaleString()}</span></div>
                     <div className="flex justify-between"><span className="text-muted-foreground">Delivery</span><span>{deliveryCharge === 0 ? "Free" : `৳${deliveryCharge}`}</span></div>
                     {paymentMethod === "partial" && (
-                      <div className="flex justify-between text-accent font-medium"><span>Pay Now (10%)</span><span>৳{partialPayment.toLocaleString()}</span></div>
+                      <div className="flex justify-between text-accent font-medium"><span>Pay Now (5%)</span><span>৳{partialPayment.toLocaleString()}</span></div>
                     )}
                     <div className="border-t pt-2 flex justify-between font-bold text-base"><span>Total</span><span>৳{grandTotal.toLocaleString()}</span></div>
                   </div>
