@@ -3,15 +3,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Search, Eye, MoreHorizontal, Trash2, Ban, Plus, Undo2, Package } from "lucide-react";
+import { Search, Eye, MoreHorizontal, Trash2, Ban, Plus, Undo2, Truck, RefreshCw, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminCreateOrder from "@/components/admin/AdminCreateOrder";
 
 const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
@@ -26,6 +25,8 @@ const AdminOrders = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [tab, setTab] = useState("active");
   const [createOpen, setCreateOpen] = useState(false);
+  const [sendingCourier, setSendingCourier] = useState(false);
+  const [syncingStatus, setSyncingStatus] = useState(false);
 
   const fetchOrders = async () => {
     const { data } = await supabase.from("orders").select("*").order("created_at", { ascending: false });
@@ -76,6 +77,56 @@ const AdminOrders = () => {
     const { error } = await supabase.from("orders").update({ payment_status: status, updated_at: new Date().toISOString() }).in("id", ids);
     if (error) toast.error("Failed to update payment");
     else { toast.success(`${ids.length} order(s) payment updated to ${status}`); setSelectedIds(new Set()); fetchOrders(); }
+  };
+
+  const sendToSteadfast = async (orderIds: string[], bulk = false) => {
+    setSendingCourier(true);
+    try {
+      const { data: session } = await supabase.auth.getSession();
+      const token = session?.session?.access_token;
+      if (!token) { toast.error("Please login first"); return; }
+
+      const res = await supabase.functions.invoke("steadfast-courier", {
+        body: { action: bulk ? "send_bulk" : "send_single", order_ids: orderIds },
+      });
+
+      if (res.error) {
+        toast.error(`Courier error: ${res.error.message}`);
+      } else if (res.data?.error) {
+        toast.error(res.data.error);
+      } else {
+        const msg = bulk
+          ? `${res.data?.sent || orderIds.length} order(s) sent to Steadfast`
+          : `Order sent to Steadfast (Tracking: ${res.data?.consignment?.tracking_code || "pending"})`;
+        toast.success(msg);
+        setSelectedIds(new Set());
+        fetchOrders();
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Failed to send to courier");
+    } finally {
+      setSendingCourier(false);
+    }
+  };
+
+  const syncCourierStatus = async () => {
+    setSyncingStatus(true);
+    try {
+      const res = await supabase.functions.invoke("steadfast-courier", {
+        body: { action: "sync_status", order_ids: [] },
+      });
+
+      if (res.error) {
+        toast.error(`Sync error: ${res.error.message}`);
+      } else {
+        toast.success(res.data?.message || "Status synced");
+        fetchOrders();
+      }
+    } catch (e: any) {
+      toast.error("Failed to sync status");
+    } finally {
+      setSyncingStatus(false);
+    }
   };
 
   const filtered = currentOrders.filter((o) => {
@@ -129,14 +180,20 @@ const AdminOrders = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-bold">Order Management</h1>
           <p className="text-sm text-muted-foreground">{orders.length} total orders ({trashedOrders.length} trashed)</p>
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="gap-2">
-          <Plus className="h-4 w-4" />Create Order
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button variant="outline" size="sm" onClick={syncCourierStatus} disabled={syncingStatus} className="gap-2">
+            {syncingStatus ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+            Sync Steadfast
+          </Button>
+          <Button onClick={() => setCreateOpen(true)} className="gap-2">
+            <Plus className="h-4 w-4" />Create Order
+          </Button>
+        </div>
       </div>
 
       <Tabs value={tab} onValueChange={(v) => { setTab(v); setSelectedIds(new Set()); }}>
@@ -167,6 +224,10 @@ const AdminOrders = () => {
           <span className="text-sm font-medium">{selectedIds.size} selected</span>
           {tab === "active" && (
             <>
+              <Button size="sm" variant="default" onClick={() => sendToSteadfast(Array.from(selectedIds), true)} disabled={sendingCourier} className="gap-1">
+                {sendingCourier ? <Loader2 className="h-4 w-4 animate-spin" /> : <Truck className="h-4 w-4" />}
+                Send to Steadfast
+              </Button>
               <Select onValueChange={bulkUpdateStatus}>
                 <SelectTrigger className="w-36 h-8 text-xs"><SelectValue placeholder="Set Status" /></SelectTrigger>
                 <SelectContent>
@@ -184,7 +245,7 @@ const AdminOrders = () => {
                 </SelectContent>
               </Select>
               <Button size="sm" variant="destructive" onClick={() => trashOrders(Array.from(selectedIds))}>
-                <Trash2 className="h-4 w-4 mr-1" />Move to Trash
+                <Trash2 className="h-4 w-4 mr-1" />Trash
               </Button>
             </>
           )}
@@ -207,6 +268,7 @@ const AdminOrders = () => {
               <th className="text-left p-3 font-medium">Total</th>
               <th className="text-left p-3 font-medium">Status</th>
               <th className="text-left p-3 font-medium">Payment</th>
+              <th className="text-left p-3 font-medium">Courier</th>
               <th className="text-left p-3 font-medium">Date</th>
               <th className="p-3 font-medium text-center">Actions</th>
             </tr>
@@ -240,6 +302,16 @@ const AdminOrders = () => {
                   <td className="p-3">
                     <Badge variant="outline" className={`text-xs capitalize ${paymentBadge(o.payment_status)}`}>{o.payment_status}</Badge>
                   </td>
+                  <td className="p-3">
+                    {o.consignment_id ? (
+                      <div>
+                        <Badge variant="secondary" className="text-xs">{o.courier_status || "sent"}</Badge>
+                        <p className="text-[10px] text-muted-foreground mt-0.5 font-mono">{o.tracking_code}</p>
+                      </div>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">—</span>
+                    )}
+                  </td>
                   <td className="p-3 text-muted-foreground text-xs whitespace-nowrap">
                     {new Date(o.created_at).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}
                   </td>
@@ -250,6 +322,11 @@ const AdminOrders = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setSelectedOrder(o)}><Eye className="h-4 w-4 mr-2" />View Details</DropdownMenuItem>
+                        {tab === "active" && !o.consignment_id && (
+                          <DropdownMenuItem onClick={() => sendToSteadfast([o.id])} disabled={sendingCourier}>
+                            <Truck className="h-4 w-4 mr-2" />Send to Steadfast
+                          </DropdownMenuItem>
+                        )}
                         <DropdownMenuSeparator />
                         {tab === "active" ? (
                           <>
@@ -275,7 +352,7 @@ const AdminOrders = () => {
               );
             })}
             {filtered.length === 0 && (
-              <tr><td colSpan={9} className="p-8 text-center text-muted-foreground">{tab === "trash" ? "Trash is empty" : "No orders found"}</td></tr>
+              <tr><td colSpan={10} className="p-8 text-center text-muted-foreground">{tab === "trash" ? "Trash is empty" : "No orders found"}</td></tr>
             )}
           </tbody>
         </table>
@@ -293,6 +370,19 @@ const AdminOrders = () => {
                 <div><span className="text-muted-foreground text-xs">Date</span><p className="font-medium">{new Date(selectedOrder.created_at).toLocaleString()}</p></div>
                 <div><span className="text-muted-foreground text-xs">Total</span><p className="font-bold text-accent text-lg">৳{Number(selectedOrder.total).toLocaleString()}</p></div>
               </div>
+
+              {/* Courier Info */}
+              {selectedOrder.consignment_id && (
+                <div className="border-t pt-3">
+                  <h4 className="font-medium mb-2 flex items-center gap-2"><Truck className="h-4 w-4" />Steadfast Courier</h4>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div><span className="text-muted-foreground">Consignment ID</span><p className="font-mono font-medium">{selectedOrder.consignment_id}</p></div>
+                    <div><span className="text-muted-foreground">Tracking Code</span><p className="font-mono font-medium">{selectedOrder.tracking_code}</p></div>
+                    <div><span className="text-muted-foreground">Courier Status</span><p className="capitalize font-medium">{selectedOrder.courier_status}</p></div>
+                  </div>
+                </div>
+              )}
+
               <div className="border-t pt-3">
                 <h4 className="font-medium mb-2">Order Items</h4>
                 {(selectedOrder.items as any[]).map((item: any, i: number) => (
@@ -313,6 +403,11 @@ const AdminOrders = () => {
                 <div className="border-t pt-3"><h4 className="font-medium mb-1">Notes</h4><p className="text-muted-foreground">{selectedOrder.notes}</p></div>
               )}
               <div className="border-t pt-3 flex gap-2">
+                {!selectedOrder.consignment_id && (
+                  <Button size="sm" onClick={() => { sendToSteadfast([selectedOrder.id]); setSelectedOrder(null); }} disabled={sendingCourier} className="gap-1">
+                    <Truck className="h-4 w-4" />Send to Steadfast
+                  </Button>
+                )}
                 <Select value={selectedOrder.order_status} onValueChange={(val) => { updateOrderStatus(selectedOrder.id, val); setSelectedOrder({ ...selectedOrder, order_status: val }); }}>
                   <SelectTrigger className="flex-1"><SelectValue /></SelectTrigger>
                   <SelectContent>{STATUS_OPTIONS.map((s) => (<SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>))}</SelectContent>
@@ -327,7 +422,6 @@ const AdminOrders = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Create Order Dialog */}
       <AdminCreateOrder open={createOpen} onOpenChange={setCreateOpen} onCreated={fetchOrders} />
     </div>
   );
