@@ -66,6 +66,13 @@ const AdminOrders = () => {
     else { toast.success(`${ids.length} order(s) restored`); setSelectedIds(new Set()); fetchOrders(); }
   };
 
+  const permanentDeleteOrders = async (ids: string[]) => {
+    if (!confirm(`Permanently delete ${ids.length} order(s)? This cannot be undone.`)) return;
+    const { error } = await supabase.from("orders").delete().in("id", ids);
+    if (error) toast.error("Failed to delete: " + error.message);
+    else { toast.success(`${ids.length} order(s) permanently deleted`); setSelectedIds(new Set()); fetchOrders(); }
+  };
+
   const bulkUpdateStatus = async (status: string) => {
     const ids = Array.from(selectedIds);
     const { error } = await supabase.from("orders").update({ order_status: status, updated_at: new Date().toISOString() }).in("id", ids);
