@@ -358,9 +358,14 @@ const AdminOrders = () => {
                             </DropdownMenuItem>
                           </>
                         ) : (
-                          <DropdownMenuItem onClick={() => restoreOrders([o.id])}>
-                            <Undo2 className="h-4 w-4 mr-2" />Restore
-                          </DropdownMenuItem>
+                          <>
+                            <DropdownMenuItem onClick={() => restoreOrders([o.id])}>
+                              <Undo2 className="h-4 w-4 mr-2" />Restore
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => permanentDeleteOrders([o.id])} className="text-destructive">
+                              <Trash2 className="h-4 w-4 mr-2" />Delete Forever
+                            </DropdownMenuItem>
+                          </>
                         )}
                       </DropdownMenuContent>
                     </DropdownMenu>
