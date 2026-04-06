@@ -1,7 +1,35 @@
+import { useState, useEffect } from "react";
 import { ShieldCheck } from "lucide-react";
 import { motion } from "framer-motion";
+import { supabase } from "@/integrations/supabase/client";
+
+interface MoneyBackData {
+  title: string;
+  description: string;
+}
+
+const defaultData: MoneyBackData = {
+  title: "100% Money Back Guarantee",
+  description: "If you're not completely satisfied with your purchase, return it within 7 days for a full refund. No questions asked.",
+};
 
 const MoneyBackBanner = () => {
+  const [data, setData] = useState<MoneyBackData>(defaultData);
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data: row } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "moneyback_settings")
+        .single();
+      if (row?.value && typeof row.value === "object") {
+        setData(prev => ({ ...prev, ...(row.value as unknown as MoneyBackData) }));
+      }
+    };
+    fetch();
+  }, []);
+
   return (
     <section className="py-12 sm:py-16">
       <div className="container">
@@ -17,9 +45,9 @@ const MoneyBackBanner = () => {
           </div>
           <div className="relative z-10">
             <ShieldCheck className="h-16 w-16 text-accent mx-auto mb-6" />
-            <h2 className="text-2xl sm:text-3xl font-bold text-primary-foreground mb-3">100% Money Back Guarantee</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-primary-foreground mb-3">{data.title}</h2>
             <p className="text-primary-foreground/70 max-w-lg mx-auto text-sm sm:text-base">
-              If you're not completely satisfied with your purchase, return it within 7 days for a full refund. No questions asked.
+              {data.description}
             </p>
           </div>
         </motion.div>

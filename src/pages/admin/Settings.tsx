@@ -6,10 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { Plus, Trash2, GripVertical, Star } from "lucide-react";
+import { Plus, Trash2, GripVertical } from "lucide-react";
 import SingleImageUpload from "@/components/admin/SingleImageUpload";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
+import HeaderSettings from "@/components/admin/settings/HeaderSettings";
+import FooterSettings from "@/components/admin/settings/FooterSettings";
+import HeroSettings from "@/components/admin/settings/HeroSettings";
+import MoneyBackSettings from "@/components/admin/settings/MoneyBackSettings";
+import { useSaveSetting } from "@/components/admin/settings/useSaveSetting";
 
 interface PromoBanner {
   title: string;
@@ -40,8 +45,8 @@ interface ReviewItem {
 }
 
 const defaultPromoBanners: PromoBanner[] = [
-  { title: "Up to 40% Off\nAudio Gear", subtitle: "", label: "Limited Offer", linkText: "Shop Audio →", linkUrl: "/shop?category=headphones", imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=400&fit=crop", variant: "primary" },
-  { title: "Smart Wearables\nCollection", subtitle: "", label: "New Arrivals", linkText: "Explore Now →", linkUrl: "/shop?category=smartwatches", imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=400&fit=crop", variant: "secondary" },
+  { title: "Up to 40% Off\nAudio Gear", subtitle: "", label: "Limited Offer", linkText: "Shop Audio →", linkUrl: "/shop?category=headphones", imageUrl: "", variant: "primary" },
+  { title: "Smart Wearables\nCollection", subtitle: "", label: "New Arrivals", linkText: "Explore Now →", linkUrl: "/shop?category=smartwatches", imageUrl: "", variant: "secondary" },
 ];
 
 const defaultComparisons: ComparisonItem[] = [
@@ -68,167 +73,85 @@ const defaultReviews: ReviewItem[] = [
 ];
 
 const AdminSettings = () => {
+  const { saving, saveSetting } = useSaveSetting();
   const [announcements, setAnnouncements] = useState<string[]>([
     "🚚 Free shipping on orders over ৳5,000",
     "🔥 Flash Sale — Up to 50% off on selected gadgets",
     "📦 Cash on Delivery available nationwide",
     "⚡ New arrivals every week — Stay tuned!",
   ]);
-  const [heroImage, setHeroImage] = useState("");
   const [promoBanners, setPromoBanners] = useState<PromoBanner[]>(defaultPromoBanners);
   const [comparisons, setComparisons] = useState<ComparisonItem[]>(defaultComparisons);
   const [keyPoints, setKeyPoints] = useState<KeyPoint[]>(defaultKeyPoints);
   const [reviews, setReviews] = useState<ReviewItem[]>(defaultReviews);
-  const [saving, setSaving] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchSettings = async () => {
       const { data } = await supabase
         .from("site_settings")
         .select("key, value")
-        .in("key", ["top_bar_announcements", "hero_image", "promo_banners", "comparison_items", "key_points", "homepage_reviews"]);
+        .in("key", ["top_bar_announcements", "promo_banners", "comparison_items", "key_points", "homepage_reviews"]);
       if (data) {
         data.forEach((row) => {
-          if (row.key === "top_bar_announcements" && Array.isArray(row.value)) {
-            setAnnouncements(row.value as string[]);
-          }
-          if (row.key === "hero_image" && typeof row.value === "string") {
-            setHeroImage(row.value);
-          }
-          if (row.key === "promo_banners" && Array.isArray(row.value)) {
-            setPromoBanners(row.value as unknown as PromoBanner[]);
-          }
-          if (row.key === "comparison_items" && Array.isArray(row.value)) {
-            setComparisons(row.value as unknown as ComparisonItem[]);
-          }
-          if (row.key === "key_points" && Array.isArray(row.value)) {
-            setKeyPoints(row.value as unknown as KeyPoint[]);
-          }
-          if (row.key === "homepage_reviews" && Array.isArray(row.value)) {
-            setReviews(row.value as unknown as ReviewItem[]);
-          }
+          if (row.key === "top_bar_announcements" && Array.isArray(row.value)) setAnnouncements(row.value as string[]);
+          if (row.key === "promo_banners" && Array.isArray(row.value)) setPromoBanners(row.value as unknown as PromoBanner[]);
+          if (row.key === "comparison_items" && Array.isArray(row.value)) setComparisons(row.value as unknown as ComparisonItem[]);
+          if (row.key === "key_points" && Array.isArray(row.value)) setKeyPoints(row.value as unknown as KeyPoint[]);
+          if (row.key === "homepage_reviews" && Array.isArray(row.value)) setReviews(row.value as unknown as ReviewItem[]);
         });
       }
     };
     fetchSettings();
   }, []);
 
-  const saveSetting = async (key: string, value: any) => {
-    setSaving(key);
-    const { data: existing } = await supabase
-      .from("site_settings")
-      .select("id")
-      .eq("key", key)
-      .single();
-
-    let error;
-    if (existing) {
-      ({ error } = await supabase
-        .from("site_settings")
-        .update({ value, updated_at: new Date().toISOString() })
-        .eq("key", key));
-    } else {
-      ({ error } = await supabase
-        .from("site_settings")
-        .insert({ key, value }));
-    }
-
-    setSaving(null);
-    if (error) {
-      toast.error("Failed to save: " + error.message);
-    } else {
-      toast.success("Saved successfully!");
-    }
-  };
-
   const updateAnnouncement = (index: number, value: string) => {
     const updated = [...announcements];
     updated[index] = value;
     setAnnouncements(updated);
   };
+  const addAnnouncement = () => setAnnouncements([...announcements, ""]);
+  const removeAnnouncement = (index: number) => setAnnouncements(announcements.filter((_, i) => i !== index));
 
-  const addAnnouncement = () => {
-    setAnnouncements([...announcements, ""]);
-  };
-
-  const removeAnnouncement = (index: number) => {
-    setAnnouncements(announcements.filter((_, i) => i !== index));
-  };
-
-  // Promo banner helpers
   const updateBanner = (index: number, field: keyof PromoBanner, value: string) => {
     const updated = [...promoBanners];
     updated[index] = { ...updated[index], [field]: value };
     setPromoBanners(updated);
   };
+  const addBanner = () => setPromoBanners([...promoBanners, { title: "", subtitle: "", label: "", linkText: "", linkUrl: "/shop", imageUrl: "", variant: "primary" }]);
+  const removeBanner = (index: number) => setPromoBanners(promoBanners.filter((_, i) => i !== index));
 
-  const addBanner = () => {
-    setPromoBanners([...promoBanners, { title: "", subtitle: "", label: "", linkText: "", linkUrl: "/shop", imageUrl: "", variant: "primary" }]);
-  };
-
-  const removeBanner = (index: number) => {
-    setPromoBanners(promoBanners.filter((_, i) => i !== index));
-  };
-
-  // Comparison helpers
   const updateComparison = (index: number, field: keyof ComparisonItem, value: any) => {
     const updated = [...comparisons];
     updated[index] = { ...updated[index], [field]: value };
     setComparisons(updated);
   };
+  const addComparison = () => setComparisons([...comparisons, { feature: "", us: true, others: false }]);
+  const removeComparison = (index: number) => setComparisons(comparisons.filter((_, i) => i !== index));
 
-  const addComparison = () => {
-    setComparisons([...comparisons, { feature: "", us: true, others: false }]);
-  };
-
-  const removeComparison = (index: number) => {
-    setComparisons(comparisons.filter((_, i) => i !== index));
-  };
-
-  // Key points helpers
   const updateKeyPoint = (index: number, field: keyof KeyPoint, value: string) => {
     const updated = [...keyPoints];
     updated[index] = { ...updated[index], [field]: value };
     setKeyPoints(updated);
   };
+  const addKeyPoint = () => setKeyPoints([...keyPoints, { icon: "Shield", title: "", desc: "" }]);
+  const removeKeyPoint = (index: number) => setKeyPoints(keyPoints.filter((_, i) => i !== index));
 
-  const addKeyPoint = () => {
-    setKeyPoints([...keyPoints, { icon: "Shield", title: "", desc: "" }]);
-  };
-
-  const removeKeyPoint = (index: number) => {
-    setKeyPoints(keyPoints.filter((_, i) => i !== index));
-  };
-
-  // Reviews helpers
   const updateReview = (index: number, field: keyof ReviewItem, value: any) => {
     const updated = [...reviews];
     updated[index] = { ...updated[index], [field]: value };
     setReviews(updated);
   };
-
-  const addReview = () => {
-    setReviews([...reviews, { name: "", rating: 5, comment: "" }]);
-  };
-
-  const removeReview = (index: number) => {
-    setReviews(reviews.filter((_, i) => i !== index));
-  };
+  const addReview = () => setReviews([...reviews, { name: "", rating: 5, comment: "" }]);
+  const removeReview = (index: number) => setReviews(reviews.filter((_, i) => i !== index));
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">Settings</h1>
 
-      {/* Store Info */}
-      <Card className="p-6 space-y-4">
-        <h2 className="font-bold text-lg">Store Information</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><Label>Store Name</Label><Input defaultValue="Techllect" /></div>
-          <div><Label>Phone</Label><Input defaultValue="+88 01835 925510" /></div>
-          <div className="sm:col-span-2"><Label>Store Description</Label><Input defaultValue="Your Trusted Tech Companion" /></div>
-        </div>
-        <Button className="rounded-full" onClick={() => toast.success("Settings saved!")}>Save Changes</Button>
-      </Card>
+      <HeaderSettings />
+      <FooterSettings />
+      <HeroSettings />
+      <MoneyBackSettings />
 
       {/* Top Bar Announcements */}
       <Card className="p-6 space-y-4">
@@ -238,18 +161,8 @@ const AdminSettings = () => {
           {announcements.map((text, i) => (
             <div key={i} className="flex items-center gap-2">
               <GripVertical className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-              <Input
-                value={text}
-                onChange={(e) => updateAnnouncement(i, e.target.value)}
-                placeholder={`Announcement ${i + 1}`}
-              />
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-destructive hover:text-destructive flex-shrink-0"
-                onClick={() => removeAnnouncement(i)}
-                disabled={announcements.length <= 1}
-              >
+              <Input value={text} onChange={(e) => updateAnnouncement(i, e.target.value)} placeholder={`Announcement ${i + 1}`} />
+              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive flex-shrink-0" onClick={() => removeAnnouncement(i)} disabled={announcements.length <= 1}>
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
@@ -259,38 +172,16 @@ const AdminSettings = () => {
           <Plus className="h-4 w-4 mr-1" /> Add Announcement
         </Button>
         <div>
-          <Button
-            className="rounded-full"
-            disabled={saving === "top_bar_announcements"}
-            onClick={() => saveSetting("top_bar_announcements", announcements.filter(a => a.trim()))}
-          >
+          <Button className="rounded-full" disabled={saving === "top_bar_announcements"} onClick={() => saveSetting("top_bar_announcements", announcements.filter(a => a.trim()))}>
             {saving === "top_bar_announcements" ? "Saving..." : "Save Announcements"}
           </Button>
         </div>
       </Card>
 
-      {/* Hero Section Image */}
-      <Card className="p-6 space-y-4">
-        <h2 className="font-bold text-lg">Hero Section Image</h2>
-        <p className="text-sm text-muted-foreground">Set the main image displayed on the homepage hero section.</p>
-        <SingleImageUpload
-          image={heroImage}
-          onChange={(url) => setHeroImage(url)}
-          folder="hero"
-        />
-        <Button
-          className="rounded-full"
-          disabled={saving === "hero_image"}
-          onClick={() => saveSetting("hero_image", heroImage)}
-        >
-          {saving === "hero_image" ? "Saving..." : "Save Hero Image"}
-        </Button>
-      </Card>
-
       {/* Promo Banners */}
       <Card className="p-6 space-y-4">
         <h2 className="font-bold text-lg">Promo Banners</h2>
-        <p className="text-sm text-muted-foreground">Manage the two promotional banners on the homepage.</p>
+        <p className="text-sm text-muted-foreground">Manage the promotional banners on the homepage.</p>
         <div className="space-y-6">
           {promoBanners.map((banner, i) => (
             <div key={i} className="border rounded-xl p-4 space-y-3">
@@ -317,11 +208,7 @@ const AdminSettings = () => {
                 <div><Label>Button Link</Label><Input value={banner.linkUrl} onChange={(e) => updateBanner(i, "linkUrl", e.target.value)} placeholder="/shop?category=..." /></div>
                 <div className="sm:col-span-2">
                   <Label>Background Image</Label>
-                  <SingleImageUpload
-                    image={banner.imageUrl}
-                    onChange={(url) => updateBanner(i, "imageUrl", url)}
-                    folder="promo-banners"
-                  />
+                  <SingleImageUpload image={banner.imageUrl} onChange={(url) => updateBanner(i, "imageUrl", url)} folder="promo-banners" />
                 </div>
               </div>
             </div>
@@ -453,16 +340,6 @@ const AdminSettings = () => {
             {saving === "homepage_reviews" ? "Saving..." : "Save Reviews"}
           </Button>
         </div>
-      </Card>
-
-      {/* Social Media */}
-      <Card className="p-6 space-y-4">
-        <h2 className="font-bold text-lg">Social Media Links</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div><Label>Facebook</Label><Input defaultValue="https://www.facebook.com/Techllect/" /></div>
-          <div><Label>Instagram</Label><Input placeholder="Instagram URL" /></div>
-        </div>
-        <Button className="rounded-full" onClick={() => toast.success("Social links saved!")}>Save Changes</Button>
       </Card>
     </div>
   );
