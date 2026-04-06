@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Plus, Trash2, GripVertical } from "lucide-react";
+import SingleImageUpload from "@/components/admin/SingleImageUpload";
 
 const AdminSettings = () => {
   const [announcements, setAnnouncements] = useState<string[]>([
