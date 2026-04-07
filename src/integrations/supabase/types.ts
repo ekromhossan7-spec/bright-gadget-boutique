@@ -121,6 +121,113 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+          read: boolean
+          room_id: string
+          sender_name: string
+          sender_type: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+          read?: boolean
+          room_id: string
+          sender_name: string
+          sender_type: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+          read?: boolean
+          room_id?: string
+          sender_name?: string
+          sender_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_room_id_fkey"
+            columns: ["room_id"]
+            isOneToOne: false
+            referencedRelation: "chat_rooms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      chat_rooms: {
+        Row: {
+          created_at: string
+          id: string
+          last_message: string | null
+          last_message_at: string | null
+          session_id: string
+          status: string
+          unread_admin: number
+          unread_visitor: number
+          updated_at: string
+          visitor_email: string | null
+          visitor_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          session_id: string
+          status?: string
+          unread_admin?: number
+          unread_visitor?: number
+          updated_at?: string
+          visitor_email?: string | null
+          visitor_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message?: string | null
+          last_message_at?: string | null
+          session_id?: string
+          status?: string
+          unread_admin?: number
+          unread_visitor?: number
+          updated_at?: string
+          visitor_email?: string | null
+          visitor_name?: string
+        }
+        Relationships: []
+      }
+      hero_sliders: {
+        Row: {
+          active: boolean | null
+          created_at: string
+          id: string
+          image_url: string
+          link_url: string | null
+          sort_order: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string
+          id?: string
+          image_url: string
+          link_url?: string | null
+          sort_order?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          link_url?: string | null
+          sort_order?: number | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           consignment_id: string | null
