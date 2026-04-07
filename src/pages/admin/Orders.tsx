@@ -14,7 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminCreateOrder from "@/components/admin/AdminCreateOrder";
 
-const STATUS_OPTIONS = ["pending", "processing", "shipped", "delivered", "cancelled"] as const;
+const STATUS_OPTIONS = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"] as const;
 const PAYMENT_STATUS_OPTIONS = ["pending", "partial", "paid", "refunded"] as const;
 
 const AdminOrders = () => {
