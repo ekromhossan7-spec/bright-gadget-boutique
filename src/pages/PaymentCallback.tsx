@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import TopBar from "@/components/store/TopBar";
 import Header from "@/components/store/Header";
 import Footer from "@/components/store/Footer";
@@ -22,13 +21,6 @@ const PaymentCallback = () => {
       }
 
       try {
-        const { data, error } = await supabase.functions.invoke("uddoktapay", {
-          body: { invoice_id: invoiceId },
-          headers: { "Content-Type": "application/json" },
-          method: "POST",
-        });
-
-        // Build proper URL with query param
         const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
         const functionUrl = `https://${projectId}.supabase.co/functions/v1/uddoktapay?action=verify-payment`;
 
@@ -75,8 +67,8 @@ const PaymentCallback = () => {
           )}
           {status === "success" && (
             <>
-              <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-                <CheckCircle className="h-10 w-10 text-green-600" />
+              <div className="w-20 h-20 rounded-full bg-accent/10 flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="h-10 w-10 text-accent" />
               </div>
               <h1 className="text-2xl font-bold mb-2">Payment Successful!</h1>
               <p className="text-muted-foreground mb-6">Your payment has been verified and your order is confirmed.</p>
