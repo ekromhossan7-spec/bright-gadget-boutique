@@ -13,6 +13,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Users, Settings, CreditCard,
   Truck, Tag, FileText, BarChart3, ArrowLeft, ShieldAlert, ChevronDown,
   PlusCircle, FolderTree, MapPin, Store, LogOut, AlertTriangle, Activity,
+  MessageCircle,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,6 +26,7 @@ const mainNav = [
   { title: "Recovery Analytics", url: "/admin/recovery-analytics", icon: Activity },
   { title: "Payments", url: "/admin/payments", icon: CreditCard },
   { title: "Customers", url: "/admin/customers", icon: Users },
+  { title: "Live Chat", url: "/admin/live-chat", icon: MessageCircle },
 ];
 
 const productNav = {
