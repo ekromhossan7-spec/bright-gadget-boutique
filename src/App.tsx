@@ -93,6 +93,7 @@ const App = () => (
                   <Route path="categories" element={<AdminCategories />} />
                   <Route path="incomplete-orders" element={<AdminIncompleteOrders />} />
                   <Route path="recovery-analytics" element={<AdminRecoveryAnalytics />} />
+                  <Route path="live-chat" element={<AdminLiveChat />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />

@@ -152,6 +152,7 @@ const AdminSettings = () => {
       <HeaderSettings />
       <FooterSettings />
       <HeroSettings />
+      <HeroSliderSettings />
       <MoneyBackSettings />
 
       {/* Top Bar Announcements */}

@@ -9,6 +9,7 @@ import CustomerReviews from "@/components/store/CustomerReviews";
 import WhyChooseUs from "@/components/store/WhyChooseUs";
 import MoneyBackBanner from "@/components/store/MoneyBackBanner";
 import Footer from "@/components/store/Footer";
+import LiveChat from "@/components/store/LiveChat";
 
 const Index = () => {
   return (
@@ -26,6 +27,7 @@ const Index = () => {
         <MoneyBackBanner />
       </main>
       <Footer />
+      <LiveChat />
     </div>
   );
 };

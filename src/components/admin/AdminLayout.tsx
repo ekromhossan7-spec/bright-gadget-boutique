@@ -26,6 +26,7 @@ const mainNav = [
   { title: "Recovery Analytics", url: "/admin/recovery-analytics", icon: Activity },
   { title: "Payments", url: "/admin/payments", icon: CreditCard },
   { title: "Customers", url: "/admin/customers", icon: Users },
+  { title: "Live Chat", url: "/admin/live-chat", icon: MessageCircle },
 ];
 
 const productNav = {
