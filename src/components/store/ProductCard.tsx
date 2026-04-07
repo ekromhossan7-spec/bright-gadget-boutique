@@ -28,7 +28,7 @@ const ProductCard = ({ id, name, slug, price, comparePrice, image, featured }: P
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
       viewport={{ once: true }}
-      className="group relative bg-card rounded-2xl border overflow-hidden hover:shadow-lg transition-shadow"
+      className="group relative bg-card rounded-2xl border overflow-hidden gadget-card"
     >
       {discount > 0 && (
         <Badge className="absolute top-3 left-3 z-10 bg-destructive text-destructive-foreground">-{discount}%</Badge>

@@ -42,7 +42,7 @@ const HeroBanner = () => {
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
           {/* Category Sidebar */}
           <div className="hidden lg:block">
-            <div className="bg-accent text-accent-foreground rounded-t-xl px-4 py-3 flex items-center gap-2">
+            <div className="bg-accent text-accent-foreground rounded-t-xl px-4 py-3 flex items-center gap-2 tech-glow">
               <SlidersHorizontal className="h-4 w-4" />
               <span className="font-bold text-sm">All Categories</span>
             </div>
@@ -71,7 +71,7 @@ const HeroBanner = () => {
           </div>
 
           {/* Slider */}
-          <div className="relative rounded-xl overflow-hidden bg-secondary aspect-[2.2/1] min-h-[200px] sm:min-h-[300px] lg:min-h-[380px]">
+          <div className="relative rounded-xl overflow-hidden bg-secondary aspect-[2.2/1] min-h-[200px] sm:min-h-[300px] lg:min-h-[380px] border-2 border-accent ring-2 ring-accent/20">
             {sliders.length > 0 ? (
               <>
                 <AnimatePresence mode="wait">
