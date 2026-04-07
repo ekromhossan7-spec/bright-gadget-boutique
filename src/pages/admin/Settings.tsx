@@ -13,6 +13,7 @@ import { Switch } from "@/components/ui/switch";
 import HeaderSettings from "@/components/admin/settings/HeaderSettings";
 import FooterSettings from "@/components/admin/settings/FooterSettings";
 import HeroSettings from "@/components/admin/settings/HeroSettings";
+import HeroSliderSettings from "@/components/admin/settings/HeroSliderSettings";
 import MoneyBackSettings from "@/components/admin/settings/MoneyBackSettings";
 import { useSaveSetting } from "@/components/admin/settings/useSaveSetting";
 
