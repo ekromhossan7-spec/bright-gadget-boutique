@@ -71,7 +71,7 @@ const HeroBanner = () => {
           </div>
 
           {/* Slider */}
-          <div className="relative rounded-xl overflow-hidden bg-secondary aspect-[2.2/1] min-h-[200px] sm:min-h-[300px] lg:min-h-[380px]">
+          <div className="relative rounded-xl overflow-hidden bg-secondary aspect-[2.2/1] min-h-[200px] sm:min-h-[300px] lg:min-h-[380px] border-2 border-accent ring-2 ring-accent/20">
             {sliders.length > 0 ? (
               <>
                 <AnimatePresence mode="wait">
