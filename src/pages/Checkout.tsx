@@ -170,7 +170,12 @@ const Checkout = () => {
 
         await markCompleted();
         clearCart();
-        window.location.href = paymentUrl;
+        // Open in top-level window (avoids iframe blocking in preview)
+        if (window.top) {
+          window.top.location.href = paymentUrl;
+        } else {
+          window.open(paymentUrl, "_blank");
+        }
       }
     } catch (err: any) {
       toast.error(err.message || "Failed to place order");
