@@ -12,12 +12,17 @@ import TopBar from "@/components/store/TopBar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAbandonedCheckout } from "@/hooks/use-abandoned-checkout";
+import { CreditCard, Banknote, Wallet } from "lucide-react";
+
+const UDDOKTAPAY_BASE_URL = "https://techllect.paymently.io/api";
+const UDDOKTAPAY_API_KEY = "fIL1lgMDoHrDdaokBrXv30dKMAVACuW0lVxDjK25";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("cod");
+  const [paymentMode, setPaymentMode] = useState<"client" | "server">("server");
   const [form, setForm] = useState({
     name: "", email: "", phone: "", address: "", city: "", area: "", notes: "",
   });
@@ -49,13 +54,89 @@ const Checkout = () => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const createOrderInDB = async (orderNumber: string, paymentStatus: string) => {
+    const { data: user } = await supabase.auth.getUser();
+    const { error } = await supabase.from("orders").insert({
+      order_number: orderNumber,
+      user_id: user?.user?.id || null,
+      guest_email: form.email,
+      guest_phone: form.phone,
+      items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image })),
+      subtotal: totalPrice,
+      delivery_charge: deliveryCharge,
+      partial_payment: partialPayment,
+      total: grandTotal,
+      payment_method: paymentMethod,
+      payment_status: paymentStatus,
+      order_status: "pending",
+      shipping_address: { name: form.name, phone: form.phone, address: form.address, city: form.city, area: form.area },
+      notes: form.notes,
+    });
+    if (error) throw error;
+  };
+
+  const initiateUddoktaPayClient = async (orderNumber: string, amount: number) => {
+    const siteUrl = window.location.origin;
+    const response = await fetch(`${UDDOKTAPAY_BASE_URL}/checkout-v2`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "RT-UDDOKTAPAY-API-KEY": UDDOKTAPAY_API_KEY,
+      },
+      body: JSON.stringify({
+        full_name: form.name,
+        email: form.email || "customer@store.com",
+        amount: String(amount),
+        metadata: { order_number: orderNumber },
+        redirect_url: `${siteUrl}/payment-callback`,
+        return_type: "GET",
+        cancel_url: `${siteUrl}/checkout`,
+      }),
+    });
+
+    const data = await response.json();
+    if (data.status && data.payment_url) {
+      return data.payment_url;
+    }
+    throw new Error(data.message || "Failed to create payment");
+  };
+
+  const initiateUddoktaPayServer = async (orderNumber: string, amount: number) => {
+    const siteUrl = window.location.origin;
+    const projectId = import.meta.env.VITE_SUPABASE_PROJECT_ID;
+    const functionUrl = `https://${projectId}.supabase.co/functions/v1/uddoktapay?action=create-charge`;
+
+    const response = await fetch(functionUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+      },
+      body: JSON.stringify({
+        full_name: form.name,
+        email: form.email || "customer@store.com",
+        amount: String(amount),
+        metadata: { order_number: orderNumber },
+        redirect_url: `${siteUrl}/payment-callback`,
+        cancel_url: `${siteUrl}/checkout`,
+      }),
+    });
+
+    const data = await response.json();
+    if (data.status && data.payment_url) {
+      return data.payment_url;
+    }
+    throw new Error(data.message || "Failed to create payment");
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (items.length === 0) return;
 
     setLoading(true);
     try {
-      // Check stock availability
+      // Check stock
       const productIds = items.map(i => i.id);
       const { data: products } = await supabase.from("products").select("id, name, in_stock, stock_quantity").in("id", productIds);
       if (products) {
@@ -66,32 +147,31 @@ const Checkout = () => {
           return;
         }
       }
+
       const orderNumber = `TL-${Date.now().toString(36).toUpperCase()}`;
-      const { data: user } = await supabase.auth.getUser();
 
-      const { error } = await supabase.from("orders").insert({
-        order_number: orderNumber,
-        user_id: user?.user?.id || null,
-        guest_email: form.email,
-        guest_phone: form.phone,
-        items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image })),
-        subtotal: totalPrice,
-        delivery_charge: deliveryCharge,
-        partial_payment: partialPayment,
-        total: grandTotal,
-        payment_method: paymentMethod,
-        payment_status: "pending",
-        order_status: "pending",
-        shipping_address: { name: form.name, phone: form.phone, address: form.address, city: form.city, area: form.area },
-        notes: form.notes,
-      });
+      if (paymentMethod === "cod") {
+        await createOrderInDB(orderNumber, "pending");
+        await markCompleted();
+        clearCart();
+        toast.success("Order placed successfully!");
+        navigate(`/order-success?order=${orderNumber}`);
+      } else {
+        // Online payment (full or partial)
+        const payAmount = paymentMethod === "partial" ? partialPayment : grandTotal;
+        await createOrderInDB(orderNumber, "awaiting_payment");
 
-      if (error) throw error;
+        let paymentUrl: string;
+        if (paymentMode === "client") {
+          paymentUrl = await initiateUddoktaPayClient(orderNumber, payAmount);
+        } else {
+          paymentUrl = await initiateUddoktaPayServer(orderNumber, payAmount);
+        }
 
-      await markCompleted();
-      clearCart();
-      toast.success("Order placed successfully!");
-      navigate(`/order-success?order=${orderNumber}`);
+        await markCompleted();
+        clearCart();
+        window.location.href = paymentUrl;
+      }
     } catch (err: any) {
       toast.error(err.message || "Failed to place order");
     } finally {
@@ -161,21 +241,64 @@ const Checkout = () => {
                 <div className="border rounded-xl p-6">
                   <h2 className="font-bold text-lg mb-4">Payment Method</h2>
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
-                    <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-secondary/50">
+                    <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "cod" ? "border-accent bg-accent/5" : "hover:bg-secondary/50"}`}>
                       <RadioGroupItem value="cod" id="cod" />
-                      <Label htmlFor="cod" className="cursor-pointer flex-1">
-                        <span className="font-medium">Cash on Delivery</span>
-                        <p className="text-sm text-muted-foreground">Pay when you receive</p>
+                      <Label htmlFor="cod" className="cursor-pointer flex-1 flex items-center gap-3">
+                        <Banknote className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <span className="font-medium">Cash on Delivery</span>
+                          <p className="text-sm text-muted-foreground">Pay when you receive</p>
+                        </div>
                       </Label>
                     </div>
-                    <div className="flex items-center space-x-3 border rounded-lg p-4 cursor-pointer hover:bg-secondary/50">
+                    <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "online" ? "border-accent bg-accent/5" : "hover:bg-secondary/50"}`}>
+                      <RadioGroupItem value="online" id="online" />
+                      <Label htmlFor="online" className="cursor-pointer flex-1 flex items-center gap-3">
+                        <CreditCard className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <span className="font-medium">Online Payment (Full)</span>
+                          <p className="text-sm text-muted-foreground">Pay ৳{grandTotal.toLocaleString()} via bKash/Nagad/Rocket/Bank</p>
+                        </div>
+                      </Label>
+                    </div>
+                    <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "partial" ? "border-accent bg-accent/5" : "hover:bg-secondary/50"}`}>
                       <RadioGroupItem value="partial" id="partial" />
-                      <Label htmlFor="partial" className="cursor-pointer flex-1">
-                         <span className="font-medium">Online Partial Payment (5%)</span>
-                        <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * 0.05).toLocaleString()} now, rest on delivery</p>
+                      <Label htmlFor="partial" className="cursor-pointer flex-1 flex items-center gap-3">
+                        <Wallet className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <span className="font-medium">Online Partial Payment (5%)</span>
+                          <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * 0.05).toLocaleString()} now, rest on delivery</p>
+                        </div>
                       </Label>
                     </div>
                   </RadioGroup>
+
+                  {/* Processing mode toggle for online payments */}
+                  {(paymentMethod === "online" || paymentMethod === "partial") && (
+                    <div className="mt-4 p-3 bg-secondary/50 rounded-lg">
+                      <Label className="text-xs text-muted-foreground mb-2 block">Payment Processing Mode</Label>
+                      <div className="flex gap-2">
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={paymentMode === "server" ? "default" : "outline"}
+                          onClick={() => setPaymentMode("server")}
+                          className="rounded-full text-xs"
+                        >
+                          🔒 Server-side (Recommended)
+                        </Button>
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant={paymentMode === "client" ? "default" : "outline"}
+                          onClick={() => setPaymentMode("client")}
+                          className="rounded-full text-xs"
+                        >
+                          ⚡ Client-side (Fast)
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -201,10 +324,19 @@ const Checkout = () => {
                     {paymentMethod === "partial" && (
                       <div className="flex justify-between text-accent font-medium"><span>Pay Now (5%)</span><span>৳{partialPayment.toLocaleString()}</span></div>
                     )}
+                    {paymentMethod === "online" && (
+                      <div className="flex justify-between text-accent font-medium"><span>Pay Now (Full)</span><span>৳{grandTotal.toLocaleString()}</span></div>
+                    )}
                     <div className="border-t pt-2 flex justify-between font-bold text-base"><span>Total</span><span>৳{grandTotal.toLocaleString()}</span></div>
                   </div>
                   <Button type="submit" className="w-full mt-6 rounded-full" size="lg" disabled={loading}>
-                    {loading ? "Placing Order..." : paymentMethod === "partial" ? `Pay ৳${partialPayment.toLocaleString()} & Place Order` : "Place Order"}
+                    {loading
+                      ? "Processing..."
+                      : paymentMethod === "cod"
+                        ? "Place Order"
+                        : paymentMethod === "partial"
+                          ? `Pay ৳${partialPayment.toLocaleString()} & Place Order`
+                          : `Pay ৳${grandTotal.toLocaleString()} & Place Order`}
                   </Button>
                 </div>
               </div>

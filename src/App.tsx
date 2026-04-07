@@ -14,6 +14,7 @@ import Contact from "./pages/Contact";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
+import PaymentCallback from "./pages/PaymentCallback";
 import TrackOrder from "./pages/TrackOrder";
 import ReturnPolicy from "./pages/ReturnPolicy";
 import ShippingInfo from "./pages/ShippingInfo";
@@ -64,6 +65,7 @@ const App = () => (
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/order-success" element={<OrderSuccess />} />
+                <Route path="/payment-callback" element={<PaymentCallback />} />
                 <Route path="/track-order" element={<TrackOrder />} />
                 <Route path="/return-policy" element={<ReturnPolicy />} />
                 <Route path="/shipping-info" element={<ShippingInfo />} />
