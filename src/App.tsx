@@ -14,6 +14,7 @@ import Contact from "./pages/Contact";
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
 import OrderSuccess from "./pages/OrderSuccess";
+import PaymentCallback from "./pages/PaymentCallback";
 import TrackOrder from "./pages/TrackOrder";
 import ReturnPolicy from "./pages/ReturnPolicy";
 import ShippingInfo from "./pages/ShippingInfo";
