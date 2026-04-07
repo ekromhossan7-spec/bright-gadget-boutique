@@ -163,6 +163,7 @@ const AdminOrders = () => {
   const statusBadge = (s: string) => {
     const map: Record<string, string> = {
       pending: "bg-warning/15 text-warning border-warning/30",
+      confirmed: "bg-blue-500/15 text-blue-600 border-blue-500/30",
       processing: "bg-accent/15 text-accent border-accent/30",
       shipped: "bg-primary/15 text-primary border-primary/30",
       delivered: "bg-success/15 text-success border-success/30",
