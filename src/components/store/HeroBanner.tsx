@@ -126,11 +126,7 @@ const HeroBanner = () => {
                   </div>
                 )}
               </>
-            ) : (
-              <div className="flex items-center justify-center h-full text-muted-foreground">
-                <p className="text-sm">Add hero slider images from Admin → Settings</p>
-              </div>
-            )}
+            ) : null}
           </div>
         </div>
       </div>
