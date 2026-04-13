@@ -18,10 +18,18 @@ const Shop = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeCategory = searchParams.get("category") || "all";
   const [search, setSearch] = useState("");
+  const [debouncedSearch, setDebouncedSearch] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
   const [displayPriceRange, setDisplayPriceRange] = useState<[number, number]>([0, 100000]);
   const priceDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout>>();
+
+  const handleSearchChange = useCallback((value: string) => {
+    setSearch(value);
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = setTimeout(() => setDebouncedSearch(value), 400);
+  }, []);
   const [minRating, setMinRating] = useState(0);
 
   const handlePriceChange = useCallback((val: number[]) => {
@@ -61,8 +69,8 @@ const Shop = () => {
     if (activeCategory !== "all") {
       result = result.filter((p: any) => p.categories?.slug === activeCategory);
     }
-    if (search) {
-      const q = search.toLowerCase();
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
       result = result.filter((p) =>
         p.name?.toLowerCase().includes(q) ||
         p.description?.toLowerCase().includes(q) ||
@@ -74,12 +82,13 @@ const Shop = () => {
     if (sortBy === "price-low") result = [...result].sort((a, b) => a.price - b.price);
     if (sortBy === "price-high") result = [...result].sort((a, b) => b.price - a.price);
     return result;
-  }, [activeCategory, search, sortBy, priceRange, products]);
+  }, [activeCategory, debouncedSearch, sortBy, priceRange, products]);
 
   const clearFilters = () => {
     setPriceRange([0, maxPrice]);
     setDisplayPriceRange([0, maxPrice]);
     setSearch("");
+    setDebouncedSearch("");
     setSortBy("default");
     setMinRating(0);
     searchParams.delete("category");
@@ -98,7 +107,7 @@ const Shop = () => {
           <Input
             placeholder="Search products..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             className="pl-10"
           />
         </div>
