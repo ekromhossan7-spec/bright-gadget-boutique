@@ -134,14 +134,14 @@ const Shop = () => {
         <Slider
           min={0}
           max={maxPrice}
-          step={100}
-          value={priceRange}
-          onValueChange={(val) => setPriceRange(val as [number, number])}
+          step={Math.max(1, Math.round(maxPrice / 200))}
+          value={displayPriceRange}
+          onValueChange={handlePriceChange}
           className="mb-3"
         />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>৳{priceRange[0].toLocaleString()}</span>
-          <span>৳{priceRange[1].toLocaleString()}</span>
+          <span>৳{displayPriceRange[0].toLocaleString()}</span>
+          <span>৳{displayPriceRange[1].toLocaleString()}</span>
         </div>
       </div>
 
