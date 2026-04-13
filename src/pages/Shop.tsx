@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import TopBar from "@/components/store/TopBar";
@@ -20,7 +20,16 @@ const Shop = () => {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
+  const [displayPriceRange, setDisplayPriceRange] = useState<[number, number]>([0, 100000]);
+  const priceDebounceRef = useRef<ReturnType<typeof setTimeout>>();
   const [minRating, setMinRating] = useState(0);
+
+  const handlePriceChange = useCallback((val: number[]) => {
+    const range = val as [number, number];
+    setDisplayPriceRange(range);
+    if (priceDebounceRef.current) clearTimeout(priceDebounceRef.current);
+    priceDebounceRef.current = setTimeout(() => setPriceRange(range), 150);
+  }, []);
 
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
@@ -63,6 +72,7 @@ const Shop = () => {
 
   const clearFilters = () => {
     setPriceRange([0, maxPrice]);
+    setDisplayPriceRange([0, maxPrice]);
     setSearch("");
     setSortBy("default");
     setMinRating(0);
@@ -124,14 +134,14 @@ const Shop = () => {
         <Slider
           min={0}
           max={maxPrice}
-          step={100}
-          value={priceRange}
-          onValueChange={(val) => setPriceRange(val as [number, number])}
+          step={Math.max(1, Math.round(maxPrice / 200))}
+          value={displayPriceRange}
+          onValueChange={handlePriceChange}
           className="mb-3"
         />
         <div className="flex justify-between text-xs text-muted-foreground">
-          <span>৳{priceRange[0].toLocaleString()}</span>
-          <span>৳{priceRange[1].toLocaleString()}</span>
+          <span>৳{displayPriceRange[0].toLocaleString()}</span>
+          <span>৳{displayPriceRange[1].toLocaleString()}</span>
         </div>
       </div>
 
