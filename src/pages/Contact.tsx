@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import TopBar from "@/components/store/TopBar";
 import Header from "@/components/store/Header";
 import Footer from "@/components/store/Footer";
@@ -8,9 +8,32 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Phone, Mail, MapPin, Facebook } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [info, setInfo] = useState({
+    phone: "+88 01835 925510",
+    email: "support@techllect.com",
+    address: "Dhaka, Bangladesh",
+    facebook_url: "https://www.facebook.com/Techllect/",
+    facebook_label: "facebook.com/Techllect",
+    maps_embed: "",
+  });
+
+  useEffect(() => {
+    const fetch = async () => {
+      const { data: row } = await supabase
+        .from("site_settings")
+        .select("value")
+        .eq("key", "contact_page")
+        .maybeSingle();
+      if (row?.value && typeof row.value === "object") {
+        setInfo((prev) => ({ ...prev, ...(row.value as any) }));
+      }
+    };
+    fetch();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,7 +62,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Phone</p>
-                    <a href="tel:+8801835925510" className="font-medium hover:text-accent transition-colors">+88 01835 925510</a>
+                    <a href={`tel:${info.phone.replace(/\s/g, "")}`} className="font-medium hover:text-accent transition-colors">{info.phone}</a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -48,7 +71,7 @@ const Contact = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Email</p>
-                    <p className="font-medium">support@techllect.com</p>
+                    <p className="font-medium">{info.email}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
@@ -57,19 +80,28 @@ const Contact = () => {
                   </div>
                   <div>
                     <p className="text-sm text-muted-foreground">Location</p>
-                    <p className="font-medium">Dhaka, Bangladesh</p>
+                    <p className="font-medium">{info.address}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
-                    <Facebook className="h-5 w-5 text-accent" />
+                {info.facebook_url && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-accent/10 flex items-center justify-center">
+                      <Facebook className="h-5 w-5 text-accent" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-muted-foreground">Facebook</p>
+                      <a href={info.facebook_url} target="_blank" rel="noopener noreferrer" className="font-medium hover:text-accent transition-colors">{info.facebook_label}</a>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">Facebook</p>
-                    <a href="https://www.facebook.com/Techllect/" target="_blank" rel="noopener noreferrer" className="font-medium hover:text-accent transition-colors">facebook.com/Techllect</a>
-                  </div>
-                </div>
+                )}
               </div>
+
+              {/* Google Maps */}
+              {info.maps_embed && (
+                <div className="rounded-2xl overflow-hidden border h-56">
+                  <iframe src={info.maps_embed} className="w-full h-full" allowFullScreen loading="lazy" title="Office location" />
+                </div>
+              )}
             </div>
 
             {/* Form */}
