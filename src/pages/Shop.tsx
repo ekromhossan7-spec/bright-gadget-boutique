@@ -62,7 +62,13 @@ const Shop = () => {
       result = result.filter((p: any) => p.categories?.slug === activeCategory);
     }
     if (search) {
-      result = result.filter((p) => p.name.toLowerCase().includes(search.toLowerCase()));
+      const q = search.toLowerCase();
+      result = result.filter((p) =>
+        p.name?.toLowerCase().includes(q) ||
+        p.description?.toLowerCase().includes(q) ||
+        p.short_description?.toLowerCase().includes(q) ||
+        p.categories?.name?.toLowerCase().includes(q)
+      );
     }
     result = result.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
     if (sortBy === "price-low") result = [...result].sort((a, b) => a.price - b.price);
