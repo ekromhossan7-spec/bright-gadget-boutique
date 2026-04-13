@@ -72,6 +72,7 @@ const Shop = () => {
 
   const clearFilters = () => {
     setPriceRange([0, maxPrice]);
+    setDisplayPriceRange([0, maxPrice]);
     setSearch("");
     setSortBy("default");
     setMinRating(0);
