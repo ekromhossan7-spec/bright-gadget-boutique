@@ -15,6 +15,7 @@ import FooterSettings from "@/components/admin/settings/FooterSettings";
 import HeroSettings from "@/components/admin/settings/HeroSettings";
 import HeroSliderSettings from "@/components/admin/settings/HeroSliderSettings";
 import MoneyBackSettings from "@/components/admin/settings/MoneyBackSettings";
+import AdBannerSettings from "@/components/admin/settings/AdBannerSettings";
 import { useSaveSetting } from "@/components/admin/settings/useSaveSetting";
 
 interface PromoBanner {
@@ -153,6 +154,7 @@ const AdminSettings = () => {
       <FooterSettings />
       <HeroSettings />
       <HeroSliderSettings />
+      <AdBannerSettings />
       <MoneyBackSettings />
 
       {/* Top Bar Announcements */}
