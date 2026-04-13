@@ -36,32 +36,35 @@ const HeroBanner = () => {
     return () => clearInterval(interval);
   }, [sliders.length]);
 
+  // Fixed height for sidebar: 9 items × 42px each + header 44px ≈ 422px
+  const SIDEBAR_HEIGHT = 422;
+
   return (
     <section className="py-4 sm:py-6">
       <div className="container">
-        <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
-          {/* Category Sidebar */}
-          <div className="hidden lg:block">
-            <div className="bg-accent text-accent-foreground rounded-t-xl px-4 py-3 flex items-center gap-2 tech-glow">
+        <div className="grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-4">
+          {/* Category Sidebar - hidden on mobile */}
+          <div className="hidden lg:flex flex-col" style={{ height: SIDEBAR_HEIGHT }}>
+            <div className="bg-accent text-accent-foreground rounded-t-xl px-4 py-2.5 flex items-center gap-2 shrink-0">
               <SlidersHorizontal className="h-4 w-4" />
               <span className="font-bold text-sm">All Categories</span>
             </div>
-            <div className="bg-background border border-t-0 rounded-b-xl divide-y">
+            <div className="bg-background border border-t-0 rounded-b-xl flex-1 overflow-y-auto hero-sidebar-scroll">
               {categories.map((cat) => (
                 <Link
                   key={cat.id}
                   to={`/shop?category=${cat.slug}`}
-                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-secondary/50 transition-colors group"
+                  className="flex items-center gap-3 px-4 py-2.5 border-b border-border/50 last:border-b-0 hover:bg-accent/10 hover:pl-5 transition-all duration-200 group"
                 >
                   {cat.image_url ? (
-                    <img src={cat.image_url} alt={cat.name} className="w-7 h-7 rounded-lg object-cover" />
+                    <img src={cat.image_url} alt={cat.name} className="w-6 h-6 rounded-md object-cover" />
                   ) : (
-                    <div className="w-7 h-7 rounded-lg bg-secondary flex items-center justify-center">
-                      <FolderTree className="h-3.5 w-3.5 text-muted-foreground" />
+                    <div className="w-6 h-6 rounded-md bg-secondary flex items-center justify-center">
+                      <FolderTree className="h-3 w-3 text-muted-foreground" />
                     </div>
                   )}
-                  <span className="text-sm font-medium text-foreground flex-1">{cat.name}</span>
-                  <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-accent transition-colors" />
+                  <span className="text-sm font-medium text-foreground flex-1 group-hover:text-accent transition-colors">{cat.name}</span>
+                  <ChevronRight className="h-3.5 w-3.5 text-muted-foreground group-hover:text-accent group-hover:translate-x-0.5 transition-all" />
                 </Link>
               ))}
               {categories.length === 0 && (
@@ -70,8 +73,22 @@ const HeroBanner = () => {
             </div>
           </div>
 
+          {/* Mobile Categories Button */}
+          <div className="lg:hidden">
+            <Link
+              to="/shop"
+              className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg bg-accent text-accent-foreground text-sm font-semibold"
+            >
+              <SlidersHorizontal className="h-4 w-4" />
+              Browse Categories
+            </Link>
+          </div>
+
           {/* Slider */}
-          <div className="relative rounded-xl overflow-hidden bg-secondary aspect-[2.2/1] min-h-[200px] sm:min-h-[300px] lg:min-h-[380px] border-2 border-accent ring-2 ring-accent/20">
+          <div
+            className="relative rounded-xl overflow-hidden bg-secondary border-2 border-accent ring-2 ring-accent/20"
+            style={{ height: SIDEBAR_HEIGHT }}
+          >
             {sliders.length > 0 ? (
               <>
                 <AnimatePresence mode="wait">
@@ -93,7 +110,6 @@ const HeroBanner = () => {
                   </motion.div>
                 </AnimatePresence>
 
-                {/* Dots */}
                 {sliders.length > 1 && (
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-10">
                     {sliders.map((_, i) => (
