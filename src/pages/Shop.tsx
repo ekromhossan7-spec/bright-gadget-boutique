@@ -20,7 +20,16 @@ const Shop = () => {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("default");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
+  const [displayPriceRange, setDisplayPriceRange] = useState<[number, number]>([0, 100000]);
+  const priceDebounceRef = useRef<ReturnType<typeof setTimeout>>();
   const [minRating, setMinRating] = useState(0);
+
+  const handlePriceChange = useCallback((val: number[]) => {
+    const range = val as [number, number];
+    setDisplayPriceRange(range);
+    if (priceDebounceRef.current) clearTimeout(priceDebounceRef.current);
+    priceDebounceRef.current = setTimeout(() => setPriceRange(range), 150);
+  }, []);
 
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<any[]>([]);
