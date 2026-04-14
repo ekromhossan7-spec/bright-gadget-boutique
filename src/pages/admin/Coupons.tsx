@@ -200,12 +200,14 @@ const AdminCoupons = () => {
                     <span className="font-mono font-bold text-lg">{c.code}</span>
                     <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success("Copied!"); }}><Copy className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" /></button>
                     {!c.active && <Badge variant="secondary">Inactive</Badge>}
+                    {notStarted(c.starts_at) && <Badge variant="outline">Scheduled</Badge>}
                     {isExpired(c.expires_at) && <Badge variant="destructive">Expired</Badge>}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {c.discount_type === "percentage" ? `${c.discount_value}% off` : `৳${c.discount_value} off`}
                     {c.min_order_amount ? ` • Min ৳${c.min_order_amount}` : ""}
                     {c.max_uses ? ` • ${c.used_count}/${c.max_uses} used` : ` • ${c.used_count} used`}
+                    {c.starts_at ? ` • Starts ${new Date(c.starts_at).toLocaleDateString()}` : ""}
                     {c.expires_at ? ` • Expires ${new Date(c.expires_at).toLocaleDateString()}` : ""}
                   </p>
                 </div>
