@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export interface CartItem {
   id: string;
@@ -31,7 +33,28 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.setItem("techllect-cart", JSON.stringify(items));
   }, [items]);
 
-  const addItem = (item: Omit<CartItem, "quantity">, quantity = 1) => {
+  const addItem = async (item: Omit<CartItem, "quantity">, quantity = 1) => {
+    // Check stock before adding
+    const { data: product } = await supabase
+      .from("products")
+      .select("in_stock, stock_quantity")
+      .eq("id", item.id)
+      .single();
+
+    if (product) {
+      const inStock = product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0);
+      if (!inStock) {
+        toast.error("This product is out of stock");
+        return;
+      }
+      // Check if requested quantity exceeds stock
+      const currentInCart = items.find((i) => i.id === item.id)?.quantity || 0;
+      if (product.stock_quantity !== null && (currentInCart + quantity) > product.stock_quantity) {
+        toast.error(`Only ${product.stock_quantity} items available in stock`);
+        return;
+      }
+    }
+
     setItems((prev) => {
       const existing = prev.find((i) => i.id === item.id);
       if (existing) {
