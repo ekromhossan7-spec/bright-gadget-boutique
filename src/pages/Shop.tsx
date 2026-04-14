@@ -8,7 +8,7 @@ import ProductCard from "@/components/store/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, SlidersHorizontal, X, Star } from "lucide-react";
-import { Slider } from "@/components/ui/slider";
+import DualRangeSlider from "@/components/store/DualRangeSlider";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
@@ -146,7 +146,7 @@ const Shop = () => {
       {/* Price Range */}
       <div>
         <h3 className="text-sm font-semibold mb-3 text-foreground uppercase tracking-wider">Price Range</h3>
-        <Slider
+        <DualRangeSlider
           min={0}
           max={maxPrice}
           step={Math.max(1, Math.round(maxPrice / 200))}
@@ -154,9 +154,9 @@ const Shop = () => {
           onValueChange={handlePriceChange}
           className="mb-3"
         />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>৳{displayPriceRange[0].toLocaleString()}</span>
-          <span>৳{displayPriceRange[1].toLocaleString()}</span>
+        <div className="flex justify-between">
+          <span className="bg-muted px-3 py-1 rounded text-xs font-semibold text-foreground">৳{displayPriceRange[0].toLocaleString()}</span>
+          <span className="bg-muted px-3 py-1 rounded text-xs font-semibold text-foreground">৳{displayPriceRange[1].toLocaleString()}</span>
         </div>
       </div>
 
