@@ -237,19 +237,19 @@ const Checkout = () => {
                           <RadioGroupItem value="inside_dhaka" id="inside_dhaka" />
                           <Label htmlFor="inside_dhaka" className="cursor-pointer">
                             <span className="font-medium">Inside Dhaka</span>
-                            <p className="text-sm text-muted-foreground">{freeDeliveryEnabled ? "Free" : "৳60"} (1-2 days)</p>
+                            <p className="text-sm text-muted-foreground">{freeDeliveryEnabled ? "Free" : `৳${shippingRates.inside_dhaka}`} (1-2 days)</p>
                           </Label>
                         </div>
                         <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer flex-1 ${shippingZone === "outside_dhaka" ? "border-primary bg-primary/5" : "hover:bg-secondary/50"}`}>
                           <RadioGroupItem value="outside_dhaka" id="outside_dhaka" />
                           <Label htmlFor="outside_dhaka" className="cursor-pointer">
                             <span className="font-medium">Outside Dhaka</span>
-                            <p className="text-sm text-muted-foreground">{freeDeliveryEnabled ? "Free" : "৳120"} (3-5 days)</p>
+                            <p className="text-sm text-muted-foreground">{freeDeliveryEnabled ? "Free" : `৳${shippingRates.outside_dhaka}`} (3-5 days)</p>
                           </Label>
                         </div>
                       </RadioGroup>
                       {freeDeliveryEnabled && <p className="text-sm text-green-600 mt-2 font-medium">🎉 Free delivery on all orders!</p>}
-                      {!freeDeliveryEnabled && totalPrice >= 5000 && <p className="text-sm text-green-600 mt-2 font-medium">🎉 Free shipping on orders above ৳5,000!</p>}
+                      {!freeDeliveryEnabled && totalPrice >= shippingRates.free_threshold && <p className="text-sm text-green-600 mt-2 font-medium">🎉 Free shipping on orders above ৳{shippingRates.free_threshold.toLocaleString()}!</p>}
                     </div>
                     <div className="sm:col-span-2"><Label htmlFor="notes">Order Notes</Label><Textarea id="notes" name="notes" value={form.notes} onChange={handleChange} placeholder="Special delivery instructions..." /></div>
                   </div>
