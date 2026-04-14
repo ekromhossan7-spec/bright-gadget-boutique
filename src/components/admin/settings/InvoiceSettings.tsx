@@ -8,6 +8,7 @@ import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { FileText } from "lucide-react";
+import SingleImageUpload from "@/components/admin/SingleImageUpload";
 
 interface InvoiceConfig {
   business_name: string;
@@ -104,9 +105,9 @@ const InvoiceSettings = () => {
             <Label>Business Email</Label>
             <Input value={config.business_email} onChange={(e) => update("business_email", e.target.value)} />
           </div>
-          <div>
-            <Label>Logo URL</Label>
-            <Input value={config.logo_url} onChange={(e) => update("logo_url", e.target.value)} placeholder="https://..." />
+          <div className="sm:col-span-2">
+            <Label>Business Logo</Label>
+            <SingleImageUpload image={config.logo_url} onChange={(url) => update("logo_url", url)} folder="invoice" />
           </div>
         </div>
         <div>
