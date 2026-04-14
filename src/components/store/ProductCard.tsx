@@ -54,9 +54,11 @@ const ProductCard = ({ id, name, slug, price, comparePrice, image, featured, inS
             <span className="font-bold text-lg">৳{price.toLocaleString()}</span>
             {comparePrice && <span className="text-sm text-muted-foreground line-through">৳{comparePrice.toLocaleString()}</span>}
           </div>
-          <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full hover:bg-accent hover:text-accent-foreground" onClick={() => addItem({ id, name, price, image, slug })}>
-            <ShoppingCart className="h-4 w-4" />
-          </Button>
+          {inStock ? (
+            <Button size="icon" variant="ghost" className="h-9 w-9 rounded-full hover:bg-accent hover:text-accent-foreground" onClick={() => addItem({ id, name, price, image, slug })}>
+              <ShoppingCart className="h-4 w-4" />
+            </Button>
+          ) : null}
         </div>
       </div>
     </motion.div>

@@ -28,6 +28,7 @@ const AdminOrders = () => {
   const [tab, setTab] = useState("active");
   const [createOpen, setCreateOpen] = useState(false);
   const [invoiceOrder, setInvoiceOrder] = useState<any>(null);
+  const [bulkInvoiceOrders, setBulkInvoiceOrders] = useState<any[]>([]);
   const [sendingCourier, setSendingCourier] = useState(false);
   const [syncingStatus, setSyncingStatus] = useState(false);
 
@@ -255,6 +256,12 @@ const AdminOrders = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <Button size="sm" variant="outline" onClick={() => {
+                const selectedOrderData = filtered.filter(o => selectedIds.has(o.id));
+                setBulkInvoiceOrders(selectedOrderData);
+              }} className="gap-1">
+                <FileText className="h-4 w-4" />Print Invoices
+              </Button>
               <Button size="sm" variant="destructive" onClick={() => trashOrders(Array.from(selectedIds))}>
                 <Trash2 className="h-4 w-4 mr-1" />Trash
               </Button>
@@ -456,6 +463,7 @@ const AdminOrders = () => {
 
       <AdminCreateOrder open={createOpen} onOpenChange={setCreateOpen} onCreated={fetchOrders} />
       <OrderInvoice order={invoiceOrder} open={!!invoiceOrder} onOpenChange={(o) => !o && setInvoiceOrder(null)} />
+      <OrderInvoice orders={bulkInvoiceOrders} open={bulkInvoiceOrders.length > 0} onOpenChange={(o) => !o && setBulkInvoiceOrders([])} />
     </div>
   );
 };
