@@ -8,7 +8,7 @@ import TopBar from "@/components/store/TopBar";
 
 const Cart = () => {
   const { items, removeItem, updateQuantity, totalPrice } = useCart();
-  const deliveryCharge = totalPrice >= 5000 ? 0 : 120;
+  
 
   if (items.length === 0) {
     return (
@@ -81,13 +81,9 @@ const Cart = () => {
                     <span className="text-muted-foreground">Subtotal</span>
                     <span>৳{totalPrice.toLocaleString()}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Delivery</span>
-                    <span>{deliveryCharge === 0 ? "Free" : `৳${deliveryCharge}`}</span>
-                  </div>
                   <div className="border-t pt-3 flex justify-between font-bold text-base">
                     <span>Total</span>
-                    <span>৳{(totalPrice + deliveryCharge).toLocaleString()}</span>
+                    <span>৳{totalPrice.toLocaleString()}</span>
                   </div>
                 </div>
                 <Button asChild className="w-full mt-6 rounded-full" size="lg">
