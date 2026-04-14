@@ -29,22 +29,34 @@ const Checkout = () => {
 
   const [shippingZone, setShippingZone] = useState("inside_dhaka");
   const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
+  const [shippingRates, setShippingRates] = useState({ inside_dhaka: 60, outside_dhaka: 120, free_threshold: 5000 });
 
   useEffect(() => {
-    const fetchSetting = async () => {
+    const fetchSettings = async () => {
       const { data } = await supabase
         .from("site_settings")
-        .select("value")
-        .eq("key", "free_delivery")
-        .maybeSingle();
-      if (data?.value && typeof data.value === "object" && "enabled" in data.value) {
-        setFreeDeliveryEnabled((data.value as { enabled: boolean }).enabled);
+        .select("key, value")
+        .in("key", ["free_delivery", "shipping_rates"]);
+      if (data) {
+        for (const row of data) {
+          if (row.key === "free_delivery" && typeof row.value === "object" && row.value !== null && "enabled" in row.value) {
+            setFreeDeliveryEnabled((row.value as { enabled: boolean }).enabled);
+          }
+          if (row.key === "shipping_rates" && typeof row.value === "object" && row.value !== null) {
+            const v = row.value as any;
+            setShippingRates({
+              inside_dhaka: v.inside_dhaka ?? 60,
+              outside_dhaka: v.outside_dhaka ?? 120,
+              free_threshold: v.free_threshold ?? 5000,
+            });
+          }
+        }
       }
     };
-    fetchSetting();
+    fetchSettings();
   }, []);
 
-  const deliveryCharge = freeDeliveryEnabled ? 0 : (totalPrice >= 5000 ? 0 : shippingZone === "inside_dhaka" ? 60 : 120);
+  const deliveryCharge = freeDeliveryEnabled ? 0 : (totalPrice >= shippingRates.free_threshold ? 0 : shippingZone === "inside_dhaka" ? shippingRates.inside_dhaka : shippingRates.outside_dhaka);
   const partialPayment = paymentMethod === "partial" ? Math.ceil((totalPrice + deliveryCharge) * 0.05) : 0;
   const grandTotal = totalPrice + deliveryCharge;
 
