@@ -212,6 +212,7 @@ export type Database = {
           id: string
           max_uses: number | null
           min_order_amount: number | null
+          starts_at: string | null
           updated_at: string
           used_count: number
         }
@@ -225,6 +226,7 @@ export type Database = {
           id?: string
           max_uses?: number | null
           min_order_amount?: number | null
+          starts_at?: string | null
           updated_at?: string
           used_count?: number
         }
@@ -238,6 +240,7 @@ export type Database = {
           id?: string
           max_uses?: number | null
           min_order_amount?: number | null
+          starts_at?: string | null
           updated_at?: string
           used_count?: number
         }
