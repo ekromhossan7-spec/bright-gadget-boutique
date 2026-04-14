@@ -342,6 +342,7 @@ const AdminOrders = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setSelectedOrder(o)}><Eye className="h-4 w-4 mr-2" />View Details</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setInvoiceOrder(o)}><FileText className="h-4 w-4 mr-2" />Invoice</DropdownMenuItem>
                         {tab === "active" && !o.consignment_id && (
                           <DropdownMenuItem onClick={() => sendToSteadfast([o.id])} disabled={sendingCourier}>
                             <Truck className="h-4 w-4 mr-2" />Send to Steadfast
@@ -451,6 +452,7 @@ const AdminOrders = () => {
       </Dialog>
 
       <AdminCreateOrder open={createOpen} onOpenChange={setCreateOpen} onCreated={fetchOrders} />
+      <OrderInvoice order={invoiceOrder} open={!!invoiceOrder} onOpenChange={(o) => !o && setInvoiceOrder(null)} />
     </div>
   );
 };
