@@ -12,7 +12,7 @@ import TopBar from "@/components/store/TopBar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAbandonedCheckout } from "@/hooks/use-abandoned-checkout";
-import { CreditCard, Banknote, Wallet } from "lucide-react";
+import { CreditCard, Banknote, Wallet, Tag, X } from "lucide-react";
 
 const UDDOKTAPAY_BASE_URL = "https://techllect.paymently.io/api";
 const UDDOKTAPAY_API_KEY = "fIL1lgMDoHrDdaokBrXv30dKMAVACuW0lVxDjK25";
@@ -30,6 +30,9 @@ const Checkout = () => {
   const [shippingZone, setShippingZone] = useState("inside_dhaka");
   const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
   const [shippingRates, setShippingRates] = useState({ inside_dhaka: 60, outside_dhaka: 120, free_threshold: 5000 });
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_type: string; discount_value: number; id: string } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -57,8 +60,36 @@ const Checkout = () => {
   }, []);
 
   const deliveryCharge = freeDeliveryEnabled ? 0 : (totalPrice >= shippingRates.free_threshold ? 0 : shippingZone === "inside_dhaka" ? shippingRates.inside_dhaka : shippingRates.outside_dhaka);
-  const partialPayment = paymentMethod === "partial" ? Math.ceil((totalPrice + deliveryCharge) * 0.05) : 0;
-  const grandTotal = totalPrice + deliveryCharge;
+  const couponDiscount = appliedCoupon
+    ? appliedCoupon.discount_type === "percentage"
+      ? Math.round(totalPrice * appliedCoupon.discount_value / 100)
+      : Math.min(appliedCoupon.discount_value, totalPrice)
+    : 0;
+  const discountedSubtotal = Math.max(0, totalPrice - couponDiscount);
+  const partialPayment = paymentMethod === "partial" ? Math.ceil((discountedSubtotal + deliveryCharge) * 0.05) : 0;
+  const grandTotal = discountedSubtotal + deliveryCharge;
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    const { data, error } = await supabase
+      .from("coupons")
+      .select("*")
+      .eq("code", couponCode.toUpperCase().trim())
+      .eq("active", true)
+      .single();
+
+    setCouponLoading(false);
+    if (error || !data) { toast.error("Invalid coupon code"); return; }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) { toast.error("This coupon has expired"); return; }
+    if (data.max_uses && data.used_count >= data.max_uses) { toast.error("This coupon has reached its usage limit"); return; }
+    if (data.min_order_amount && totalPrice < data.min_order_amount) { toast.error(`Minimum order ৳${data.min_order_amount} required`); return; }
+
+    setAppliedCoupon({ code: data.code, discount_type: data.discount_type, discount_value: data.discount_value, id: data.id });
+    toast.success(`Coupon "${data.code}" applied!`);
+  };
+
+  const removeCoupon = () => { setAppliedCoupon(null); setCouponCode(""); };
 
   const { markCompleted } = useAbandonedCheckout(form, paymentMethod, items, totalPrice, deliveryCharge, grandTotal);
 
@@ -82,7 +113,7 @@ const Checkout = () => {
       payment_status: paymentStatus,
       order_status: "pending",
       shipping_address: { name: form.name, phone: form.phone, address: form.address, city: form.city, area: form.area },
-      notes: form.notes,
+      notes: form.notes + (appliedCoupon ? ` | Coupon: ${appliedCoupon.code} (-৳${couponDiscount})` : ""),
     });
     if (error) throw error;
   };
@@ -335,8 +366,11 @@ const Checkout = () => {
                       </div>
                     ))}
                   </div>
-                  <div className="border-t pt-3 space-y-2 text-sm">
+                   <div className="border-t pt-3 space-y-2 text-sm">
                     <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>৳{totalPrice.toLocaleString()}</span></div>
+                    {couponDiscount > 0 && (
+                      <div className="flex justify-between text-green-600 font-medium"><span>Coupon ({appliedCoupon?.code})</span><span>-৳{couponDiscount.toLocaleString()}</span></div>
+                    )}
                     <div className="flex justify-between"><span className="text-muted-foreground">Delivery</span><span>{deliveryCharge === 0 ? "Free" : `৳${deliveryCharge}`}</span></div>
                     {paymentMethod === "partial" && (
                       <div className="flex justify-between text-accent font-medium"><span>Pay Now (5%)</span><span>৳{partialPayment.toLocaleString()}</span></div>
@@ -345,6 +379,27 @@ const Checkout = () => {
                       <div className="flex justify-between text-accent font-medium"><span>Pay Now (Full)</span><span>৳{grandTotal.toLocaleString()}</span></div>
                     )}
                     <div className="border-t pt-2 flex justify-between font-bold text-base"><span>Total</span><span>৳{grandTotal.toLocaleString()}</span></div>
+                  </div>
+
+                  {/* Coupon Code */}
+                  <div className="border-t pt-4 mt-4">
+                    {appliedCoupon ? (
+                      <div className="flex items-center justify-between bg-green-50 dark:bg-green-950/30 p-3 rounded-lg">
+                        <div className="flex items-center gap-2">
+                          <Tag className="h-4 w-4 text-green-600" />
+                          <span className="text-sm font-medium text-green-700 dark:text-green-400">{appliedCoupon.code}</span>
+                          <span className="text-xs text-green-600">(-৳{couponDiscount.toLocaleString()})</span>
+                        </div>
+                        <button type="button" onClick={removeCoupon}><X className="h-4 w-4 text-muted-foreground hover:text-foreground" /></button>
+                      </div>
+                    ) : (
+                      <div className="flex gap-2">
+                        <Input placeholder="Coupon code" value={couponCode} onChange={(e) => setCouponCode(e.target.value)} className="text-sm" />
+                        <Button type="button" variant="outline" size="sm" onClick={applyCoupon} disabled={couponLoading} className="rounded-full whitespace-nowrap">
+                          {couponLoading ? "..." : "Apply"}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                   <Button type="submit" className="w-full mt-6 rounded-full" size="lg" disabled={loading}>
                     {loading
