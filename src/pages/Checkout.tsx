@@ -12,7 +12,7 @@ import TopBar from "@/components/store/TopBar";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAbandonedCheckout } from "@/hooks/use-abandoned-checkout";
-import { CreditCard, Banknote, Wallet } from "lucide-react";
+import { CreditCard, Banknote, Wallet, Tag, X } from "lucide-react";
 
 const UDDOKTAPAY_BASE_URL = "https://techllect.paymently.io/api";
 const UDDOKTAPAY_API_KEY = "fIL1lgMDoHrDdaokBrXv30dKMAVACuW0lVxDjK25";
@@ -30,6 +30,9 @@ const Checkout = () => {
   const [shippingZone, setShippingZone] = useState("inside_dhaka");
   const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
   const [shippingRates, setShippingRates] = useState({ inside_dhaka: 60, outside_dhaka: 120, free_threshold: 5000 });
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_type: string; discount_value: number; id: string } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     const fetchSettings = async () => {
@@ -57,8 +60,36 @@ const Checkout = () => {
   }, []);
 
   const deliveryCharge = freeDeliveryEnabled ? 0 : (totalPrice >= shippingRates.free_threshold ? 0 : shippingZone === "inside_dhaka" ? shippingRates.inside_dhaka : shippingRates.outside_dhaka);
-  const partialPayment = paymentMethod === "partial" ? Math.ceil((totalPrice + deliveryCharge) * 0.05) : 0;
-  const grandTotal = totalPrice + deliveryCharge;
+  const couponDiscount = appliedCoupon
+    ? appliedCoupon.discount_type === "percentage"
+      ? Math.round(totalPrice * appliedCoupon.discount_value / 100)
+      : Math.min(appliedCoupon.discount_value, totalPrice)
+    : 0;
+  const discountedSubtotal = Math.max(0, totalPrice - couponDiscount);
+  const partialPayment = paymentMethod === "partial" ? Math.ceil((discountedSubtotal + deliveryCharge) * 0.05) : 0;
+  const grandTotal = discountedSubtotal + deliveryCharge;
+
+  const applyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    setCouponLoading(true);
+    const { data, error } = await supabase
+      .from("coupons")
+      .select("*")
+      .eq("code", couponCode.toUpperCase().trim())
+      .eq("active", true)
+      .single();
+
+    setCouponLoading(false);
+    if (error || !data) { toast.error("Invalid coupon code"); return; }
+    if (data.expires_at && new Date(data.expires_at) < new Date()) { toast.error("This coupon has expired"); return; }
+    if (data.max_uses && data.used_count >= data.max_uses) { toast.error("This coupon has reached its usage limit"); return; }
+    if (data.min_order_amount && totalPrice < data.min_order_amount) { toast.error(`Minimum order ৳${data.min_order_amount} required`); return; }
+
+    setAppliedCoupon({ code: data.code, discount_type: data.discount_type, discount_value: data.discount_value, id: data.id });
+    toast.success(`Coupon "${data.code}" applied!`);
+  };
+
+  const removeCoupon = () => { setAppliedCoupon(null); setCouponCode(""); };
 
   const { markCompleted } = useAbandonedCheckout(form, paymentMethod, items, totalPrice, deliveryCharge, grandTotal);
 
