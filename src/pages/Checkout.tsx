@@ -116,13 +116,7 @@ const Checkout = () => {
       notes: form.notes + (appliedCoupon ? ` | Coupon: ${appliedCoupon.code} (-৳${couponDiscount})` : ""),
     });
     if (error) throw error;
-
-    // Increment coupon used_count
-    if (appliedCoupon) {
-      await supabase.rpc("has_role", { _user_id: "00000000-0000-0000-0000-000000000000", _role: "admin" }).then(() => {});
-      // Use direct update - admin RLS will handle it, or we do it via a simpler approach
-      // Since anon can't update coupons, we'll skip incrementing here - admin can see order notes
-    }
+  };
   };
 
   const initiateUddoktaPayClient = async (orderNumber: string, amount: number) => {
