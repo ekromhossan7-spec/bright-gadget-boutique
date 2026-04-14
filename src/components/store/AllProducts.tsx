@@ -16,6 +16,11 @@ const AllProducts = () => {
   const [productsByCategory, setProductsByCategory] = useState<Record<string, any[]>>({});
   const [uncategorized, setUncategorized] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(3);
+
+  const handleShowMore = useCallback(() => {
+    setVisibleCount((prev) => prev + 3);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
