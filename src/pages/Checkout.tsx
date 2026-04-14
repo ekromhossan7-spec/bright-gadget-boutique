@@ -116,6 +116,10 @@ const Checkout = () => {
       notes: form.notes + (appliedCoupon ? ` | Coupon: ${appliedCoupon.code} (-৳${couponDiscount})` : ""),
     });
     if (error) throw error;
+
+    if (appliedCoupon) {
+      await supabase.rpc("increment_coupon_usage" as any, { _coupon_id: appliedCoupon.id });
+    }
   };
 
   const initiateUddoktaPayClient = async (orderNumber: string, amount: number) => {
