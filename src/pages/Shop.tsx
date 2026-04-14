@@ -284,6 +284,7 @@ const Shop = () => {
                       price={product.price}
                       comparePrice={product.compare_price}
                       image={product.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80"}
+                      inStock={product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)}
                     />
                   ))}
                 </div>
