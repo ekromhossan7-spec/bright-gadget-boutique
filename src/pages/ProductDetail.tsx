@@ -122,7 +122,7 @@ const ProductDetail = () => {
 
               <p className="text-muted-foreground">{product.short_description || product.description}</p>
 
-              {product.in_stock ? (
+              {(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) ? (
                 <Badge variant="outline" className="border-success text-success">In Stock</Badge>
               ) : (
                 <Badge variant="outline" className="border-destructive text-destructive">Out of Stock</Badge>
@@ -140,8 +140,8 @@ const ProductDetail = () => {
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <Button size="lg" className="flex-1 rounded-full" disabled={!product.in_stock} onClick={() => { addItem({ id: product.id, name: product.name, price: product.price, image: images[0], slug: product.slug }, quantity); }}>
-                  <ShoppingCart className="h-5 w-5 mr-2" />{product.in_stock ? "Add to Cart" : "Out of Stock"}
+                <Button size="lg" className="flex-1 rounded-full" disabled={!(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0))} onClick={() => { addItem({ id: product.id, name: product.name, price: product.price, image: images[0], slug: product.slug }, quantity); }}>
+                  <ShoppingCart className="h-5 w-5 mr-2" />{(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) ? "Add to Cart" : "Out of Stock"}
                 </Button>
                 <Button size="lg" variant="outline" className={`rounded-full ${isInWishlist(product.id) ? "text-destructive border-destructive" : ""}`} onClick={() => toggleItem(product.id)}>
                   <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-destructive" : ""}`} />
@@ -206,7 +206,7 @@ const ProductDetail = () => {
               <h2 className="text-2xl font-bold mb-6">Related Products</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {related.map((p) => (
-                  <ProductCard key={p.id} id={p.id} name={p.name} slug={p.slug} price={p.price} comparePrice={p.compare_price} image={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400"} />
+                  <ProductCard key={p.id} id={p.id} name={p.name} slug={p.slug} price={p.price} comparePrice={p.compare_price} image={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400"} inStock={p.in_stock !== false && (p.stock_quantity === null || p.stock_quantity > 0)} />
                 ))}
               </div>
             </section>
