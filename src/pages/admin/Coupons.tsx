@@ -116,6 +116,7 @@ const AdminCoupons = () => {
   };
 
   const isExpired = (d: string | null) => d ? new Date(d) < new Date() : false;
+  const notStarted = (d: string | null) => d ? new Date(d) > new Date() : false;
 
   return (
     <div className="space-y-6">
