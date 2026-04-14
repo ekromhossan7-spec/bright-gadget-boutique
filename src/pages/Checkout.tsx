@@ -117,7 +117,6 @@ const Checkout = () => {
     });
     if (error) throw error;
   };
-  };
 
   const initiateUddoktaPayClient = async (orderNumber: string, amount: number) => {
     const siteUrl = window.location.origin;
