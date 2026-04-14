@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import ProductCard from "./ProductCard";
@@ -16,6 +16,11 @@ const AllProducts = () => {
   const [productsByCategory, setProductsByCategory] = useState<Record<string, any[]>>({});
   const [uncategorized, setUncategorized] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [visibleCount, setVisibleCount] = useState(3);
+
+  const handleShowMore = useCallback(() => {
+    setVisibleCount((prev) => prev + 3);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,7 +85,7 @@ const AllProducts = () => {
   return (
     <section className="py-12 sm:py-16">
       <div className="container space-y-14">
-        {categories.map((cat) => {
+        {categories.slice(0, visibleCount).map((cat) => {
           const items = productsByCategory[cat.id] || [];
           const displayItems = items.slice(0, 5);
           const hasMore = items.length > 5;
@@ -114,8 +119,8 @@ const AllProducts = () => {
           );
         })}
 
-        {/* Uncategorized products */}
-        {uncategorized.length > 0 && (
+        {/* Uncategorized products — only show if within visible count */}
+        {uncategorized.length > 0 && visibleCount > categories.length && (
           <div>
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl sm:text-2xl font-bold border-b-2 border-primary pb-1">
@@ -138,6 +143,19 @@ const AllProducts = () => {
                 />
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Browse All Products button */}
+        {(visibleCount < categories.length + (uncategorized.length > 0 ? 1 : 0)) && (
+          <div className="flex justify-center pt-4">
+            <Button
+              onClick={handleShowMore}
+              size="lg"
+              className="rounded-full px-10 py-3 text-base font-semibold bg-primary hover:bg-primary/90 shadow-lg"
+            >
+              Browse All Products
+            </Button>
           </div>
         )}
       </div>
