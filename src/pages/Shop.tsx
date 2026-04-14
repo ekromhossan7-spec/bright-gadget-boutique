@@ -224,7 +224,7 @@ const Shop = () => {
                       <SheetTitle>Filters</SheetTitle>
                     </SheetHeader>
                     <ScrollArea className="h-[calc(100vh-80px)] px-6 pb-6">
-                      <SidebarContent />
+                      {sidebarContent}
                     </ScrollArea>
                   </SheetContent>
                 </Sheet>
@@ -247,7 +247,7 @@ const Shop = () => {
             {!isMobile && (
               <aside className="w-[250px] shrink-0">
                 <div className="sticky top-4 border rounded-2xl bg-card p-5 overflow-y-auto max-h-[calc(100vh-2rem)]">
-                  <SidebarContent />
+                  {sidebarContent}
                 </div>
               </aside>
             )}
