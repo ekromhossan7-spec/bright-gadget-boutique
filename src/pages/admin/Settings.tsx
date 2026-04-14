@@ -1,5 +1,6 @@
 import HeaderSettings from "@/components/admin/settings/HeaderSettings";
 import FooterSettings from "@/components/admin/settings/FooterSettings";
+import InvoiceSettings from "@/components/admin/settings/InvoiceSettings";
 
 const AdminSettings = () => {
   return (
@@ -12,6 +13,7 @@ const AdminSettings = () => {
 
       <HeaderSettings />
       <FooterSettings />
+      <InvoiceSettings />
     </div>
   );
 };
