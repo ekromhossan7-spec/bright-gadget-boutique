@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Search, Eye, MoreHorizontal, Trash2, Ban, Plus, Undo2, Truck, RefreshCw, Loader2 } from "lucide-react";
+import { Search, Eye, MoreHorizontal, Trash2, Ban, Plus, Undo2, Truck, RefreshCw, Loader2, FileText } from "lucide-react";
 import { FraudBadge, FraudDetail } from "@/components/admin/FraudCheck";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminCreateOrder from "@/components/admin/AdminCreateOrder";
+import OrderInvoice from "@/components/admin/OrderInvoice";
 
 const STATUS_OPTIONS = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"] as const;
 const PAYMENT_STATUS_OPTIONS = ["pending", "partial", "paid", "refunded"] as const;
