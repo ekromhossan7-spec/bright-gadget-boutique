@@ -126,9 +126,6 @@ const AllProducts = () => {
               <h2 className="text-xl sm:text-2xl font-bold border-b-2 border-primary pb-1">
                 Other Products
               </h2>
-              <Button asChild variant="default" size="sm" className="rounded-full text-xs">
-                <Link to="/shop">See More →</Link>
-              </Button>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
               {uncategorized.slice(0, 5).map((p) => (
