@@ -33,12 +33,14 @@ const defaultConfig: InvoiceConfig = {
 };
 
 interface Props {
-  order: any;
+  order?: any;
+  orders?: any[];
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-const OrderInvoice = ({ order, open, onOpenChange }: Props) => {
+const OrderInvoice = ({ order, orders, open, onOpenChange }: Props) => {
+  const allOrders = orders?.length ? orders : order ? [order] : [];
   const [config, setConfig] = useState<InvoiceConfig>(defaultConfig);
   const invoiceRef = useRef<HTMLDivElement>(null);
 
@@ -57,10 +59,9 @@ const OrderInvoice = ({ order, open, onOpenChange }: Props) => {
     }
   }, [open]);
 
-  if (!order) return null;
+  if (allOrders.length === 0) return null;
 
-  const addr = order.shipping_address as any;
-  const items = Array.isArray(order.items) ? order.items : [];
+  const isBulk = allOrders.length > 1;
 
   const handlePrint = () => {
     const printContent = invoiceRef.current;
