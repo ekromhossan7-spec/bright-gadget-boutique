@@ -13,7 +13,6 @@ const FeaturedProducts = () => {
         .from("products")
         .select("*")
         .eq("featured", true)
-        .eq("in_stock", true)
         .order("created_at", { ascending: false })
         .limit(8);
       if (data) setProducts(data);
@@ -63,6 +62,7 @@ const FeaturedProducts = () => {
               price={p.price}
               comparePrice={p.compare_price}
               image={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80"}
+              inStock={p.in_stock !== false && (p.stock_quantity === null || p.stock_quantity > 0)}
             />
           ))}
         </div>

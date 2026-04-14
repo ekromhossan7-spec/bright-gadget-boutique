@@ -20,6 +20,7 @@ interface Coupon {
   max_uses: number | null;
   used_count: number;
   active: boolean;
+  starts_at: string | null;
   expires_at: string | null;
   created_at: string;
 }
@@ -31,6 +32,7 @@ const emptyCoupon = {
   min_order_amount: 0,
   max_uses: null as number | null,
   active: true,
+  starts_at: "",
   expires_at: "",
 };
 
@@ -63,6 +65,7 @@ const AdminCoupons = () => {
       min_order_amount: form.min_order_amount || 0,
       max_uses: form.max_uses || null,
       active: form.active,
+      starts_at: form.starts_at || null,
       expires_at: form.expires_at || null,
     };
 
@@ -94,6 +97,7 @@ const AdminCoupons = () => {
       min_order_amount: c.min_order_amount || 0,
       max_uses: c.max_uses,
       active: c.active,
+      starts_at: c.starts_at ? c.starts_at.split("T")[0] : "",
       expires_at: c.expires_at ? c.expires_at.split("T")[0] : "",
     });
     setDialogOpen(true);
@@ -112,6 +116,7 @@ const AdminCoupons = () => {
   };
 
   const isExpired = (d: string | null) => d ? new Date(d) < new Date() : false;
+  const notStarted = (d: string | null) => d ? new Date(d) > new Date() : false;
 
   return (
     <div className="space-y-6">
@@ -154,9 +159,15 @@ const AdminCoupons = () => {
                   <Input type="number" value={form.max_uses ?? ""} onChange={(e) => setForm({ ...form, max_uses: e.target.value ? Number(e.target.value) : null })} placeholder="Unlimited" />
                 </div>
               </div>
-              <div>
-                <Label>Expiry Date</Label>
-                <Input type="date" value={form.expires_at} onChange={(e) => setForm({ ...form, expires_at: e.target.value })} />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>Start Date</Label>
+                  <Input type="date" value={form.starts_at} onChange={(e) => setForm({ ...form, starts_at: e.target.value })} />
+                </div>
+                <div>
+                  <Label>Expiry Date</Label>
+                  <Input type="date" value={form.expires_at} onChange={(e) => setForm({ ...form, expires_at: e.target.value })} />
+                </div>
               </div>
               <div className="flex items-center gap-2">
                 <Switch checked={form.active} onCheckedChange={(c) => setForm({ ...form, active: c })} />
@@ -189,12 +200,14 @@ const AdminCoupons = () => {
                     <span className="font-mono font-bold text-lg">{c.code}</span>
                     <button onClick={() => { navigator.clipboard.writeText(c.code); toast.success("Copied!"); }}><Copy className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" /></button>
                     {!c.active && <Badge variant="secondary">Inactive</Badge>}
+                    {notStarted(c.starts_at) && <Badge variant="outline">Scheduled</Badge>}
                     {isExpired(c.expires_at) && <Badge variant="destructive">Expired</Badge>}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {c.discount_type === "percentage" ? `${c.discount_value}% off` : `৳${c.discount_value} off`}
                     {c.min_order_amount ? ` • Min ৳${c.min_order_amount}` : ""}
                     {c.max_uses ? ` • ${c.used_count}/${c.max_uses} used` : ` • ${c.used_count} used`}
+                    {c.starts_at ? ` • Starts ${new Date(c.starts_at).toLocaleDateString()}` : ""}
                     {c.expires_at ? ` • Expires ${new Date(c.expires_at).toLocaleDateString()}` : ""}
                   </p>
                 </div>

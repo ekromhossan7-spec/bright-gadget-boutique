@@ -14,9 +14,10 @@ interface ProductCardProps {
   comparePrice?: number;
   image: string;
   featured?: boolean;
+  inStock?: boolean;
 }
 
-const ProductCard = ({ id, name, slug, price, comparePrice, image, featured }: ProductCardProps) => {
+const ProductCard = ({ id, name, slug, price, comparePrice, image, featured, inStock = true }: ProductCardProps) => {
   const { addItem } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
   const discount = comparePrice ? Math.round(((comparePrice - price) / comparePrice) * 100) : 0;
@@ -30,7 +31,10 @@ const ProductCard = ({ id, name, slug, price, comparePrice, image, featured }: P
       viewport={{ once: true }}
       className="group relative bg-card rounded-2xl border overflow-hidden gadget-card"
     >
-      {discount > 0 && (
+      {!inStock && (
+        <Badge className="absolute top-3 left-3 z-10 bg-muted text-muted-foreground border">Out of Stock</Badge>
+      )}
+      {inStock && discount > 0 && (
         <Badge className="absolute top-3 left-3 z-10 bg-destructive text-destructive-foreground">-{discount}%</Badge>
       )}
       <button onClick={() => toggleItem(id)} className={`absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-background/80 backdrop-blur flex items-center justify-center hover:bg-background transition-colors ${wishlisted ? "text-destructive" : ""}`}>

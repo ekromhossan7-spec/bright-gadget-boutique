@@ -26,7 +26,7 @@ const AllProducts = () => {
     const fetchData = async () => {
       const [catRes, prodRes] = await Promise.all([
         supabase.from("categories").select("id, name, slug").order("sort_order"),
-        supabase.from("products").select("*").eq("in_stock", true).order("created_at", { ascending: false }),
+        supabase.from("products").select("*").order("created_at", { ascending: false }),
       ]);
 
       const cats = catRes.data || [];
@@ -112,6 +112,7 @@ const AllProducts = () => {
                     price={p.price}
                     comparePrice={p.compare_price}
                     image={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80"}
+                    inStock={p.in_stock !== false && (p.stock_quantity === null || p.stock_quantity > 0)}
                   />
                 ))}
               </div>
@@ -137,6 +138,7 @@ const AllProducts = () => {
                   price={p.price}
                   comparePrice={p.compare_price}
                   image={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80"}
+                  inStock={p.in_stock !== false && (p.stock_quantity === null || p.stock_quantity > 0)}
                 />
               ))}
             </div>

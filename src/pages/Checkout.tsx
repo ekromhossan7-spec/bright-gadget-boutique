@@ -81,6 +81,7 @@ const Checkout = () => {
 
     setCouponLoading(false);
     if (error || !data) { toast.error("Invalid coupon code"); return; }
+    if (data.starts_at && new Date(data.starts_at) > new Date()) { toast.error("This coupon is not active yet"); return; }
     if (data.expires_at && new Date(data.expires_at) < new Date()) { toast.error("This coupon has expired"); return; }
     if (data.max_uses && data.used_count >= data.max_uses) { toast.error("This coupon has reached its usage limit"); return; }
     if (data.min_order_amount && totalPrice < data.min_order_amount) { toast.error(`Minimum order ৳${data.min_order_amount} required`); return; }

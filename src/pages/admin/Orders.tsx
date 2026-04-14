@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Search, Eye, MoreHorizontal, Trash2, Ban, Plus, Undo2, Truck, RefreshCw, Loader2 } from "lucide-react";
+import { Search, Eye, MoreHorizontal, Trash2, Ban, Plus, Undo2, Truck, RefreshCw, Loader2, FileText } from "lucide-react";
 import { FraudBadge, FraudDetail } from "@/components/admin/FraudCheck";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import AdminCreateOrder from "@/components/admin/AdminCreateOrder";
+import OrderInvoice from "@/components/admin/OrderInvoice";
 
 const STATUS_OPTIONS = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"] as const;
 const PAYMENT_STATUS_OPTIONS = ["pending", "partial", "paid", "refunded"] as const;
@@ -26,6 +27,7 @@ const AdminOrders = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [tab, setTab] = useState("active");
   const [createOpen, setCreateOpen] = useState(false);
+  const [invoiceOrder, setInvoiceOrder] = useState<any>(null);
   const [sendingCourier, setSendingCourier] = useState(false);
   const [syncingStatus, setSyncingStatus] = useState(false);
 
@@ -340,6 +342,7 @@ const AdminOrders = () => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem onClick={() => setSelectedOrder(o)}><Eye className="h-4 w-4 mr-2" />View Details</DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setInvoiceOrder(o)}><FileText className="h-4 w-4 mr-2" />Invoice</DropdownMenuItem>
                         {tab === "active" && !o.consignment_id && (
                           <DropdownMenuItem onClick={() => sendToSteadfast([o.id])} disabled={sendingCourier}>
                             <Truck className="h-4 w-4 mr-2" />Send to Steadfast
@@ -428,7 +431,10 @@ const AdminOrders = () => {
               {selectedOrder.notes && (
                 <div className="border-t pt-3"><h4 className="font-medium mb-1">Notes</h4><p className="text-muted-foreground">{selectedOrder.notes}</p></div>
               )}
-              <div className="border-t pt-3 flex gap-2">
+              <div className="border-t pt-3 flex gap-2 flex-wrap">
+                <Button size="sm" variant="outline" onClick={() => { setInvoiceOrder(selectedOrder); }} className="gap-1">
+                  <FileText className="h-4 w-4" />Invoice
+                </Button>
                 {!selectedOrder.consignment_id && (
                   <Button size="sm" onClick={() => { sendToSteadfast([selectedOrder.id]); setSelectedOrder(null); }} disabled={sendingCourier} className="gap-1">
                     <Truck className="h-4 w-4" />Send to Steadfast
@@ -449,6 +455,7 @@ const AdminOrders = () => {
       </Dialog>
 
       <AdminCreateOrder open={createOpen} onOpenChange={setCreateOpen} onCreated={fetchOrders} />
+      <OrderInvoice order={invoiceOrder} open={!!invoiceOrder} onOpenChange={(o) => !o && setInvoiceOrder(null)} />
     </div>
   );
 };
