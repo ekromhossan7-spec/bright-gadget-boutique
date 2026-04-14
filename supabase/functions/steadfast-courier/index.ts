@@ -8,8 +8,15 @@ const corsHeaders = {
 const STEADFAST_BASE = "https://portal.packzy.com/api/v1";
 
 async function steadfastFetch(path: string, options: RequestInit = {}) {
-  const apiKey = Deno.env.get("STEADFAST_API_KEY")!;
-  const secretKey = Deno.env.get("STEADFAST_SECRET_KEY")!;
+  const apiKey = Deno.env.get("STEADFAST_API_KEY");
+  const secretKey = Deno.env.get("STEADFAST_SECRET_KEY");
+
+  if (!apiKey || !secretKey) {
+    console.error("Missing STEADFAST_API_KEY or STEADFAST_SECRET_KEY");
+    throw new Error("Steadfast API credentials not configured");
+  }
+
+  console.log(`Steadfast request: ${options.method || "GET"} ${STEADFAST_BASE}${path}`);
 
   const res = await fetch(`${STEADFAST_BASE}${path}`, {
     ...options,
@@ -21,12 +28,17 @@ async function steadfastFetch(path: string, options: RequestInit = {}) {
     },
   });
 
-  const contentType = res.headers.get("content-type");
-  if (contentType && contentType.includes("application/json")) {
-    return res.json();
-  } else {
-    const errorText = await res.text();
-    throw new Error(`Steadfast API error: ${errorText}`);
+  const responseText = await res.text();
+  console.log(`Steadfast response status: ${res.status}, body: ${responseText.substring(0, 500)}`);
+
+  if (!res.ok) {
+    throw new Error(`Steadfast API error (${res.status}): ${responseText.substring(0, 300)}`);
+  }
+
+  try {
+    return JSON.parse(responseText);
+  } catch {
+    throw new Error(`Steadfast API returned non-JSON: ${responseText.substring(0, 300)}`);
   }
 }
 
@@ -201,6 +213,7 @@ Deno.serve(async (req) => {
 
     return new Response(JSON.stringify({ error: "Invalid action" }), { status: 400, headers: corsHeaders });
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: corsHeaders });
+    console.error("Steadfast courier error:", error.message);
+    return new Response(JSON.stringify({ error: error.message }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
   }
 });
