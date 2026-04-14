@@ -431,7 +431,10 @@ const AdminOrders = () => {
               {selectedOrder.notes && (
                 <div className="border-t pt-3"><h4 className="font-medium mb-1">Notes</h4><p className="text-muted-foreground">{selectedOrder.notes}</p></div>
               )}
-              <div className="border-t pt-3 flex gap-2">
+              <div className="border-t pt-3 flex gap-2 flex-wrap">
+                <Button size="sm" variant="outline" onClick={() => { setInvoiceOrder(selectedOrder); }} className="gap-1">
+                  <FileText className="h-4 w-4" />Invoice
+                </Button>
                 {!selectedOrder.consignment_id && (
                   <Button size="sm" onClick={() => { sendToSteadfast([selectedOrder.id]); setSelectedOrder(null); }} disabled={sendingCourier} className="gap-1">
                     <Truck className="h-4 w-4" />Send to Steadfast
