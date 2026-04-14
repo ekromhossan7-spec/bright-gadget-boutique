@@ -27,6 +27,7 @@ const AdminOrders = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [tab, setTab] = useState("active");
   const [createOpen, setCreateOpen] = useState(false);
+  const [invoiceOrder, setInvoiceOrder] = useState<any>(null);
   const [sendingCourier, setSendingCourier] = useState(false);
   const [syncingStatus, setSyncingStatus] = useState(false);
 
