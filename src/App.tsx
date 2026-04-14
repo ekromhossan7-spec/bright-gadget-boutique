@@ -28,6 +28,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Wishlist from "./pages/Wishlist";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
+import MyReviews from "./pages/MyReviews";
 import NotFound from "./pages/NotFound";
 
 import AdminLayout from "./components/admin/AdminLayout";
@@ -77,6 +78,7 @@ const App = () => (
                 <Route path="/account" element={<Account />} />
                 <Route path="/product/:slug" element={<ProductDetail />} />
                 <Route path="/wishlist" element={<Wishlist />} />
+                <Route path="/my-reviews" element={<MyReviews />} />
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-conditions" element={<TermsConditions />} />
 

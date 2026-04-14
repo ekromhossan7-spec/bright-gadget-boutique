@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import Header from "@/components/store/Header";
 import TopBar from "@/components/store/TopBar";
 import Footer from "@/components/store/Footer";
-import { User, Package, MapPin, KeyRound, LogOut, Eye, EyeOff, Shield } from "lucide-react";
+import { User, Package, MapPin, KeyRound, LogOut, Eye, EyeOff, Shield, MessageSquare } from "lucide-react";
 import { useIsAdmin } from "@/hooks/use-admin";
 
 const Account = () => {
@@ -124,7 +124,7 @@ const Account = () => {
                   <div className="text-center py-8 text-muted-foreground">
                     <Package className="h-12 w-12 mx-auto mb-3 opacity-50" />
                     <p>No orders yet</p>
-                    <Button asChild className="mt-4 rounded-full"><Link to="/shop">Start Shopping</Link></Button>
+                     <Button asChild className="mt-4 rounded-full"><Link to="/shop">Start Shopping</Link></Button>
                   </div>
                 ) : (
                   <div className="space-y-3">
@@ -142,6 +142,11 @@ const Account = () => {
                     ))}
                   </div>
                 )}
+                <div className="mt-4 pt-4 border-t">
+                  <Button asChild variant="outline" className="rounded-full">
+                    <Link to="/my-reviews"><MessageSquare className="h-4 w-4 mr-2" />Write Product Reviews</Link>
+                  </Button>
+                </div>
               </div>
             </TabsContent>
 

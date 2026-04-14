@@ -13,6 +13,7 @@ import ProductCard from "@/components/store/ProductCard";
 import { ShoppingCart, Heart, Minus, Plus, Star, Truck, ShieldCheck, RotateCcw, ChevronRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import ReviewForm from "@/components/store/ReviewForm";
 
 const ProductDetail = () => {
   const { slug } = useParams();
@@ -178,8 +179,8 @@ const ProductDetail = () => {
                 </tbody></table>
               ) : <p className="text-muted-foreground">No specifications available.</p>}
             </TabsContent>
-            <TabsContent value="reviews" className="border rounded-xl p-6 mt-4">
-              {reviews.length === 0 ? <p className="text-muted-foreground">No reviews yet.</p> : (
+            <TabsContent value="reviews" className="border rounded-xl p-6 mt-4 space-y-6">
+              {reviews.length === 0 ? <p className="text-muted-foreground">No reviews yet. Be the first to review!</p> : (
                 <div className="space-y-4">
                   {reviews.map((r: any) => (
                     <div key={r.id} className="border-b pb-4 last:border-0">
@@ -193,6 +194,9 @@ const ProductDetail = () => {
                   ))}
                 </div>
               )}
+              <ReviewForm productId={product.id} onSubmitted={() => {
+                supabase.from("reviews").select("*").eq("product_id", product.id).eq("approved", true).order("created_at", { ascending: false }).then(({ data }) => { if (data) setReviews(data); });
+              }} />
             </TabsContent>
           </Tabs>
 
