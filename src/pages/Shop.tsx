@@ -97,7 +97,7 @@ const Shop = () => {
 
   const hasActiveFilters = priceRange[0] > 0 || priceRange[1] < maxPrice || activeCategory !== "all" || search || minRating > 0;
 
-  const SidebarContent = () => (
+  const sidebarContent = (
     <div className="space-y-6">
       {/* Search */}
       <div>
