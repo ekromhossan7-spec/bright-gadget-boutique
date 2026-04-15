@@ -77,7 +77,7 @@ const Checkout = () => {
       : Math.min(appliedCoupon.discount_value, totalPrice)
     : 0;
   const discountedSubtotal = Math.max(0, totalPrice - couponDiscount);
-  const partialPayment = paymentMethod === "partial" ? Math.ceil((discountedSubtotal + deliveryCharge) * 0.05) : 0;
+  const partialPayment = paymentMethod === "partial" ? Math.ceil((discountedSubtotal + deliveryCharge) * (partialPercent / 100)) : 0;
   const grandTotal = discountedSubtotal + deliveryCharge;
 
   const applyCoupon = async () => {
