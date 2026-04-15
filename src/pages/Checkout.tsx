@@ -305,6 +305,7 @@ const Checkout = () => {
                 <div className="border rounded-xl p-6">
                   <h2 className="font-bold text-lg mb-4">Payment Method</h2>
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
+                    {codEnabled && (
                     <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "cod" ? "border-accent bg-accent/5" : "hover:bg-secondary/50"}`}>
                       <RadioGroupItem value="cod" id="cod" />
                       <Label htmlFor="cod" className="cursor-pointer flex-1 flex items-center gap-3">
@@ -315,6 +316,8 @@ const Checkout = () => {
                         </div>
                       </Label>
                     </div>
+                    )}
+                    {uddoktapayEnabled && (
                     <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "online" ? "border-accent bg-accent/5" : "hover:bg-secondary/50"}`}>
                       <RadioGroupItem value="online" id="online" />
                       <Label htmlFor="online" className="cursor-pointer flex-1 flex items-center gap-3">
@@ -325,16 +328,19 @@ const Checkout = () => {
                         </div>
                       </Label>
                     </div>
+                    )}
+                    {uddoktapayEnabled && (
                     <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "partial" ? "border-accent bg-accent/5" : "hover:bg-secondary/50"}`}>
                       <RadioGroupItem value="partial" id="partial" />
                       <Label htmlFor="partial" className="cursor-pointer flex-1 flex items-center gap-3">
                         <Wallet className="h-5 w-5 text-muted-foreground" />
                         <div>
-                          <span className="font-medium">Online Partial Payment (5%)</span>
-                          <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * 0.05).toLocaleString()} now, rest on delivery</p>
+                          <span className="font-medium">Online Partial Payment ({partialPercent}%)</span>
+                          <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * (partialPercent / 100)).toLocaleString()} now, rest on delivery</p>
                         </div>
                       </Label>
                     </div>
+                    )}
                   </RadioGroup>
 
                   {/* Processing mode toggle for online payments */}
