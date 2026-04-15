@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Search, Plus, Edit, Trash2, Save } from "lucide-react";
 import ImageUpload from "@/components/admin/ImageUpload";
+import ColorVariantEditor, { type ColorVariant } from "@/components/admin/ColorVariantEditor";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
@@ -19,6 +20,7 @@ const emptyProduct = {
   description: "", short_description: "", sku: "",
   stock_quantity: 0, in_stock: true, featured: false,
   category_id: null as string | null, images: [] as string[], tags: [] as string[],
+  color_variants: [] as ColorVariant[],
 };
 
 const AdminProducts = () => {
@@ -202,6 +204,12 @@ const AdminProducts = () => {
                   onChange={(imgs) => setEditProduct({ ...editProduct, images: imgs })}
                 />
               </div>
+
+              {/* Color Variants */}
+              <ColorVariantEditor
+                variants={editProduct.color_variants || []}
+                onChange={(variants) => setEditProduct({ ...editProduct, color_variants: variants })}
+              />
 
               {/* Toggles */}
               <div className="flex gap-6">
