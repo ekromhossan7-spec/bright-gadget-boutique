@@ -14,8 +14,8 @@ import { toast } from "sonner";
 import { useAbandonedCheckout } from "@/hooks/use-abandoned-checkout";
 import { CreditCard, Banknote, Wallet, Tag, X } from "lucide-react";
 
-const UDDOKTAPAY_BASE_URL = "https://techllect.paymently.io/api";
-const UDDOKTAPAY_API_KEY = "fIL1lgMDoHrDdaokBrXv30dKMAVACuW0lVxDjK25";
+let UDDOKTAPAY_BASE_URL = "https://techllect.paymently.io/api";
+let UDDOKTAPAY_API_KEY = "fIL1lgMDoHrDdaokBrXv30dKMAVACuW0lVxDjK25";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
