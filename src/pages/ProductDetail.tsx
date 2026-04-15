@@ -133,6 +133,24 @@ const ProductDetail = () => {
                 <Badge variant="outline" className="border-destructive text-destructive">Out of Stock</Badge>
               )}
 
+              {/* Color Variants */}
+              {colorVariants.length > 0 && (
+                <div>
+                  <span className="text-sm font-medium mb-2 block">Color: {selectedColor || "Select a color"}</span>
+                  <div className="flex gap-2 flex-wrap">
+                    {colorVariants.map((cv: any) => (
+                      <button
+                        key={cv.name}
+                        onClick={() => { setSelectedColor(cv.name); setSelectedImage(0); }}
+                        className={`w-9 h-9 rounded-full border-2 transition-all ${selectedColor === cv.name ? "border-accent scale-110 ring-2 ring-accent/30" : "border-muted hover:border-foreground/50"}`}
+                        style={{ backgroundColor: cv.hex }}
+                        title={cv.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Quantity */}
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium">Quantity:</span>
