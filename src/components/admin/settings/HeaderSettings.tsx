@@ -22,7 +22,7 @@ const defaultNavLinks: NavLink[] = [
 
 const HeaderSettings = () => {
   const { saving, saveSetting } = useSaveSetting();
-  const [storeName, setStoreName] = useState("Techllect");
+  const [storeName, setStoreName] = useState("Best E-Shop");
   const [logoUrl, setLogoUrl] = useState("");
   const [navLinks, setNavLinks] = useState<NavLink[]>(defaultNavLinks);
 

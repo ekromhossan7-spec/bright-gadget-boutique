@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import defaultLogo from "@/assets/logo.png";
+import defaultLogo from "@/assets/logo.jpg";
 
 interface FooterLink {
   label: string;
@@ -44,12 +44,12 @@ const defaultFooter: FooterData = {
   facebook: "https://www.facebook.com/Techllect/",
   instagram: "",
   youtube: "",
-  copyright: "© {year} Techllect. All rights reserved Ekrom Hossan (Software Developer)",
+  copyright: "© {year} Best E-Shop. All rights reserved Ekrom Hossan (Software Developer)",
 };
 
 const Footer = () => {
   const [footer, setFooter] = useState<FooterData>(defaultFooter);
-  const [storeName, setStoreName] = useState("Techllect");
+  const [storeName, setStoreName] = useState("Best E-Shop");
   const [logoUrl, setLogoUrl] = useState("");
 
   useEffect(() => {
