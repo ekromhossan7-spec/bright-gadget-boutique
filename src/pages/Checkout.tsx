@@ -33,13 +33,16 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_type: string; discount_value: number; id: string } | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
+  const [codEnabled, setCodEnabled] = useState(true);
+  const [uddoktapayEnabled, setUddoktapayEnabled] = useState(true);
+  const [partialPercent, setPartialPercent] = useState(5);
 
   useEffect(() => {
     const fetchSettings = async () => {
       const { data } = await supabase
         .from("site_settings")
         .select("key, value")
-        .in("key", ["free_delivery", "shipping_rates"]);
+        .in("key", ["free_delivery", "shipping_rates", "payment_settings"]);
       if (data) {
         for (const row of data) {
           if (row.key === "free_delivery" && typeof row.value === "object" && row.value !== null && "enabled" in row.value) {
@@ -52,6 +55,14 @@ const Checkout = () => {
               outside_dhaka: v.outside_dhaka ?? 120,
               free_threshold: v.free_threshold ?? 5000,
             });
+          }
+          if (row.key === "payment_settings" && typeof row.value === "object" && row.value !== null) {
+            const ps = row.value as any;
+            if (ps.cod_enabled !== undefined) setCodEnabled(ps.cod_enabled);
+            if (ps.uddoktapay_enabled !== undefined) setUddoktapayEnabled(ps.uddoktapay_enabled);
+            if (ps.partial_payment_percentage) setPartialPercent(ps.partial_payment_percentage);
+            if (ps.uddoktapay_api_url) UDDOKTAPAY_BASE_URL = ps.uddoktapay_api_url;
+            if (ps.uddoktapay_api_key) UDDOKTAPAY_API_KEY = ps.uddoktapay_api_key;
           }
         }
       }
