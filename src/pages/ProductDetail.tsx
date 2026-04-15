@@ -25,6 +25,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -69,7 +70,11 @@ const ProductDetail = () => {
     );
   }
 
-  const images = product.images?.length ? product.images : ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600"];
+  const colorVariants = Array.isArray((product as any).color_variants) ? (product as any).color_variants : [];
+  const activeColorVariant = colorVariants.find((c: any) => c.name === selectedColor);
+  const images = activeColorVariant?.image
+    ? [activeColorVariant.image, ...(product.images?.length ? product.images : [])]
+    : product.images?.length ? product.images : ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600"];
   const discount = product.compare_price ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
   const avgRating = reviews.length ? (reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length).toFixed(1) : "0";
 
