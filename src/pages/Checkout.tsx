@@ -116,7 +116,7 @@ const Checkout = () => {
       user_id: user?.user?.id || null,
       guest_email: form.email,
       guest_phone: form.phone,
-      items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image })),
+      items: items.map((i) => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image, ...(i.color ? { color: i.color } : {}) })),
       subtotal: totalPrice,
       delivery_charge: deliveryCharge,
       partial_payment: partialPayment,
