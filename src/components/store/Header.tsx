@@ -10,7 +10,7 @@ import { useIsAdmin } from "@/hooks/use-admin";
 import { Badge } from "@/components/ui/badge";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { supabase } from "@/integrations/supabase/client";
-import defaultLogo from "@/assets/logo.png";
+import defaultLogo from "@/assets/logo.jpg";
 
 interface NavLink {
   label: string;
@@ -30,7 +30,7 @@ const Header = () => {
   const { user } = useAuth();
   const isAdmin = useIsAdmin();
   const [searchOpen, setSearchOpen] = useState(false);
-  const [storeName, setStoreName] = useState("Techllect");
+  const [storeName, setStoreName] = useState("Best E-Shop");
   const [logoUrl, setLogoUrl] = useState("");
   const [navLinks, setNavLinks] = useState<NavLink[]>(defaultNavLinks);
 
