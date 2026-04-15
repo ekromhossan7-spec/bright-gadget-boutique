@@ -423,7 +423,11 @@ const AdminOrders = () => {
                 <h4 className="font-medium mb-2">Order Items</h4>
                 {(selectedOrder.items as any[]).map((item: any, i: number) => (
                   <div key={i} className="flex justify-between py-1.5 border-b last:border-0">
-                    <span className="text-muted-foreground">{item.name} × {item.quantity}</span>
+                    <span className="text-muted-foreground">
+                      {item.name}
+                      {item.color && <Badge variant="outline" className="ml-1.5 text-[10px] px-1.5 py-0">{item.color}</Badge>}
+                      {" "}× {item.quantity}
+                    </span>
                     <span className="font-medium">৳{(item.price * item.quantity).toLocaleString()}</span>
                   </div>
                 ))}
