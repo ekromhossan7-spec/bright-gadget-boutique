@@ -14,8 +14,8 @@ import { toast } from "sonner";
 import { useAbandonedCheckout } from "@/hooks/use-abandoned-checkout";
 import { CreditCard, Banknote, Wallet, Tag, X } from "lucide-react";
 
-const UDDOKTAPAY_BASE_URL = "https://techllect.paymently.io/api";
-const UDDOKTAPAY_API_KEY = "fIL1lgMDoHrDdaokBrXv30dKMAVACuW0lVxDjK25";
+let UDDOKTAPAY_BASE_URL = "https://techllect.paymently.io/api";
+let UDDOKTAPAY_API_KEY = "fIL1lgMDoHrDdaokBrXv30dKMAVACuW0lVxDjK25";
 
 const Checkout = () => {
   const { items, totalPrice, clearCart } = useCart();
@@ -33,13 +33,16 @@ const Checkout = () => {
   const [couponCode, setCouponCode] = useState("");
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_type: string; discount_value: number; id: string } | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
+  const [codEnabled, setCodEnabled] = useState(true);
+  const [uddoktapayEnabled, setUddoktapayEnabled] = useState(true);
+  const [partialPercent, setPartialPercent] = useState(5);
 
   useEffect(() => {
     const fetchSettings = async () => {
       const { data } = await supabase
         .from("site_settings")
         .select("key, value")
-        .in("key", ["free_delivery", "shipping_rates"]);
+        .in("key", ["free_delivery", "shipping_rates", "payment_settings"]);
       if (data) {
         for (const row of data) {
           if (row.key === "free_delivery" && typeof row.value === "object" && row.value !== null && "enabled" in row.value) {
@@ -52,6 +55,14 @@ const Checkout = () => {
               outside_dhaka: v.outside_dhaka ?? 120,
               free_threshold: v.free_threshold ?? 5000,
             });
+          }
+          if (row.key === "payment_settings" && typeof row.value === "object" && row.value !== null) {
+            const ps = row.value as any;
+            if (ps.cod_enabled !== undefined) setCodEnabled(ps.cod_enabled);
+            if (ps.uddoktapay_enabled !== undefined) setUddoktapayEnabled(ps.uddoktapay_enabled);
+            if (ps.partial_payment_percentage) setPartialPercent(ps.partial_payment_percentage);
+            if (ps.uddoktapay_api_url) UDDOKTAPAY_BASE_URL = ps.uddoktapay_api_url;
+            if (ps.uddoktapay_api_key) UDDOKTAPAY_API_KEY = ps.uddoktapay_api_key;
           }
         }
       }
@@ -66,7 +77,7 @@ const Checkout = () => {
       : Math.min(appliedCoupon.discount_value, totalPrice)
     : 0;
   const discountedSubtotal = Math.max(0, totalPrice - couponDiscount);
-  const partialPayment = paymentMethod === "partial" ? Math.ceil((discountedSubtotal + deliveryCharge) * 0.05) : 0;
+  const partialPayment = paymentMethod === "partial" ? Math.ceil((discountedSubtotal + deliveryCharge) * (partialPercent / 100)) : 0;
   const grandTotal = discountedSubtotal + deliveryCharge;
 
   const applyCoupon = async () => {
@@ -294,6 +305,7 @@ const Checkout = () => {
                 <div className="border rounded-xl p-6">
                   <h2 className="font-bold text-lg mb-4">Payment Method</h2>
                   <RadioGroup value={paymentMethod} onValueChange={setPaymentMethod} className="space-y-3">
+                    {codEnabled && (
                     <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "cod" ? "border-accent bg-accent/5" : "hover:bg-secondary/50"}`}>
                       <RadioGroupItem value="cod" id="cod" />
                       <Label htmlFor="cod" className="cursor-pointer flex-1 flex items-center gap-3">
@@ -304,6 +316,8 @@ const Checkout = () => {
                         </div>
                       </Label>
                     </div>
+                    )}
+                    {uddoktapayEnabled && (
                     <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "online" ? "border-accent bg-accent/5" : "hover:bg-secondary/50"}`}>
                       <RadioGroupItem value="online" id="online" />
                       <Label htmlFor="online" className="cursor-pointer flex-1 flex items-center gap-3">
@@ -314,16 +328,19 @@ const Checkout = () => {
                         </div>
                       </Label>
                     </div>
+                    )}
+                    {uddoktapayEnabled && (
                     <div className={`flex items-center space-x-3 border rounded-lg p-4 cursor-pointer transition-colors ${paymentMethod === "partial" ? "border-accent bg-accent/5" : "hover:bg-secondary/50"}`}>
                       <RadioGroupItem value="partial" id="partial" />
                       <Label htmlFor="partial" className="cursor-pointer flex-1 flex items-center gap-3">
                         <Wallet className="h-5 w-5 text-muted-foreground" />
                         <div>
-                          <span className="font-medium">Online Partial Payment (5%)</span>
-                          <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * 0.05).toLocaleString()} now, rest on delivery</p>
+                          <span className="font-medium">Online Partial Payment ({partialPercent}%)</span>
+                          <p className="text-sm text-muted-foreground">Pay ৳{Math.ceil(grandTotal * (partialPercent / 100)).toLocaleString()} now, rest on delivery</p>
                         </div>
                       </Label>
                     </div>
+                    )}
                   </RadioGroup>
 
                   {/* Processing mode toggle for online payments */}
