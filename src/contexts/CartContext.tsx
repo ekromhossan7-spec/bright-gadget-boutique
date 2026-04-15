@@ -9,6 +9,7 @@ export interface CartItem {
   image: string;
   quantity: number;
   slug: string;
+  color?: string;
 }
 
 interface CartContextType {
@@ -56,9 +57,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
 
     setItems((prev) => {
-      const existing = prev.find((i) => i.id === item.id);
+      const existing = prev.find((i) => i.id === item.id && i.color === item.color);
       if (existing) {
-        return prev.map((i) => i.id === item.id ? { ...i, quantity: i.quantity + quantity } : i);
+        return prev.map((i) => (i.id === item.id && i.color === item.color) ? { ...i, quantity: i.quantity + quantity } : i);
       }
       return [...prev, { ...item, quantity }];
     });

@@ -25,6 +25,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [selectedColor, setSelectedColor] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -69,7 +70,11 @@ const ProductDetail = () => {
     );
   }
 
-  const images = product.images?.length ? product.images : ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600"];
+  const colorVariants = Array.isArray((product as any).color_variants) ? (product as any).color_variants : [];
+  const activeColorVariant = colorVariants.find((c: any) => c.name === selectedColor);
+  const images = activeColorVariant?.image
+    ? [activeColorVariant.image, ...(product.images?.length ? product.images : [])]
+    : product.images?.length ? product.images : ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600"];
   const discount = product.compare_price ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
   const avgRating = reviews.length ? (reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length).toFixed(1) : "0";
 
@@ -128,6 +133,24 @@ const ProductDetail = () => {
                 <Badge variant="outline" className="border-destructive text-destructive">Out of Stock</Badge>
               )}
 
+              {/* Color Variants */}
+              {colorVariants.length > 0 && (
+                <div>
+                  <span className="text-sm font-medium mb-2 block">Color: {selectedColor || "Select a color"}</span>
+                  <div className="flex gap-2 flex-wrap">
+                    {colorVariants.map((cv: any) => (
+                      <button
+                        key={cv.name}
+                        onClick={() => { setSelectedColor(cv.name); setSelectedImage(0); }}
+                        className={`w-9 h-9 rounded-full border-2 transition-all ${selectedColor === cv.name ? "border-accent scale-110 ring-2 ring-accent/30" : "border-muted hover:border-foreground/50"}`}
+                        style={{ backgroundColor: cv.hex }}
+                        title={cv.name}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Quantity */}
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium">Quantity:</span>
@@ -140,8 +163,8 @@ const ProductDetail = () => {
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <Button size="lg" className="flex-1 rounded-full" disabled={!(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0))} onClick={() => { addItem({ id: product.id, name: product.name, price: product.price, image: images[0], slug: product.slug }, quantity); }}>
-                  <ShoppingCart className="h-5 w-5 mr-2" />{(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) ? "Add to Cart" : "Out of Stock"}
+                <Button size="lg" className="flex-1 rounded-full" disabled={!(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) || (colorVariants.length > 0 && !selectedColor)} onClick={() => { addItem({ id: product.id, name: product.name, price: product.price, image: activeColorVariant?.image || images[0], slug: product.slug, color: selectedColor || undefined }, quantity); }}>
+                  <ShoppingCart className="h-5 w-5 mr-2" />{(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) ? (colorVariants.length > 0 && !selectedColor ? "Select a Color" : "Add to Cart") : "Out of Stock"}
                 </Button>
                 <Button size="lg" variant="outline" className={`rounded-full ${isInWishlist(product.id) ? "text-destructive border-destructive" : ""}`} onClick={() => toggleItem(product.id)}>
                   <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-destructive" : ""}`} />
