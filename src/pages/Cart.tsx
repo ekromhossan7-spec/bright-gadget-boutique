@@ -41,7 +41,7 @@ const Cart = () => {
             {/* Cart Items */}
             <div className="lg:col-span-2 space-y-4">
               {items.map((item) => (
-                <div key={item.id} className="flex gap-4 p-4 border rounded-xl">
+                <div key={`${item.id}-${item.color || ''}`} className="flex gap-4 p-4 border rounded-xl">
                   <Link to={`/product/${item.slug}`} className="w-20 h-20 sm:w-24 sm:h-24 rounded-lg overflow-hidden bg-secondary flex-shrink-0">
                     <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
                   </Link>
@@ -49,6 +49,7 @@ const Cart = () => {
                     <Link to={`/product/${item.slug}`} className="font-medium text-sm sm:text-base line-clamp-2 hover:text-accent transition-colors">
                       {item.name}
                     </Link>
+                    {item.color && <p className="text-xs text-muted-foreground mt-0.5">Color: {item.color}</p>}
                     <p className="font-bold mt-1">৳{item.price.toLocaleString()}</p>
                     <div className="flex items-center gap-3 mt-3">
                       <div className="flex items-center border rounded-full">
