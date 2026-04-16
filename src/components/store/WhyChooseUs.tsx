@@ -77,7 +77,7 @@ const WhyChooseUs = () => {
             <div className="grid grid-cols-3 bg-primary text-primary-foreground p-4 text-sm font-semibold">
               <span>Feature</span>
               <span className="text-center">Best E-Shop</span>
-              <parameter name="text-center">Others</span>
+              <span className="text-center">Others</span>
             </div>
             {comparisons.map((item, i) => (
               <div key={i} className={`grid grid-cols-3 p-4 text-sm ${i % 2 === 0 ? "bg-secondary/50" : ""}`}>
