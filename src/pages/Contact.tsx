@@ -14,9 +14,9 @@ const Contact = () => {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [info, setInfo] = useState({
     phone: "+88 01835 925510",
-    email: "support@techllect.com",
+    email: "support@besteshop.com",
     address: "Dhaka, Bangladesh",
-    facebook_url: "https://www.facebook.com/Techllect/",
+    facebook_url: "https://www.facebook.com/BestEShop/",
     facebook_label: "facebook.com/Techllect",
     maps_embed: "",
   });

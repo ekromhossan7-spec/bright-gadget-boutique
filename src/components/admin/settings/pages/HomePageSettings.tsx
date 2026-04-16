@@ -235,8 +235,8 @@ const HomePageSettings = () => {
 
       {/* Comparison Table */}
       <Card className="p-6 space-y-4">
-        <h2 className="font-bold text-lg">Why Techllect — Comparison Table</h2>
-        <p className="text-sm text-muted-foreground">Manage the "Why Techllect?" comparison table items.</p>
+        <h2 className="font-bold text-lg">Why Best E-Shop — Comparison Table</h2>
+        <p className="text-sm text-muted-foreground">Manage the "Why Best E-Shop?" comparison table items.</p>
         <div className="space-y-3">
           {comparisons.map((item, i) => (
             <div key={i} className="flex items-center gap-3 border rounded-lg p-3">

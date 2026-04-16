@@ -14,12 +14,12 @@ const TermsConditions = () => (
           <p className="text-muted-foreground mt-2">Last updated: January 2026</p>
         </div>
         <div className="prose max-w-none space-y-6">
-          <section><h2 className="text-xl font-bold">General</h2><p className="text-muted-foreground">By using Techllect, you agree to these terms. We reserve the right to update them at any time.</p></section>
+          <section><h2 className="text-xl font-bold">General</h2><p className="text-muted-foreground">By using Best E-Shop, you agree to these terms. We reserve the right to update them at any time.</p></section>
           <section><h2 className="text-xl font-bold">Products & Pricing</h2><p className="text-muted-foreground">All prices are in BDT (৳). We strive for accuracy but reserve the right to correct pricing errors. Product availability is subject to change.</p></section>
           <section><h2 className="text-xl font-bold">Orders & Payment</h2><p className="text-muted-foreground">Orders are confirmed via email/SMS. We accept Cash on Delivery and online payments. Orders may be cancelled if fraud is suspected.</p></section>
           <section><h2 className="text-xl font-bold">Shipping & Delivery</h2><p className="text-muted-foreground">Delivery times vary by location. We are not responsible for delays caused by third-party couriers or natural disasters.</p></section>
           <section><h2 className="text-xl font-bold">Returns & Refunds</h2><p className="text-muted-foreground">Please refer to our Return Policy page for detailed return and refund information.</p></section>
-          <section><h2 className="text-xl font-bold">Limitation of Liability</h2><p className="text-muted-foreground">Techllect shall not be liable for any indirect, incidental, or consequential damages arising from the use of our platform.</p></section>
+          <section><h2 className="text-xl font-bold">Limitation of Liability</h2><p className="text-muted-foreground">Best E-Shop shall not be liable for any indirect, incidental, or consequential damages arising from the use of our platform.</p></section>
         </div>
       </div>
     </main>

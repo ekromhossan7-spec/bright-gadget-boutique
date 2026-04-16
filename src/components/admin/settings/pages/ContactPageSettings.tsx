@@ -18,10 +18,10 @@ interface ContactPageData {
 
 const defaults: ContactPageData = {
   phone: "+88 01835 925510",
-  email: "support@techllect.com",
+  email: "support@besteshop.com",
   address: "Dhaka, Bangladesh",
-  facebook_url: "https://www.facebook.com/Techllect/",
-  facebook_label: "facebook.com/Techllect",
+  facebook_url: "https://www.facebook.com/BestEShop/",
+  facebook_label: "facebook.com/BestEShop",
   maps_embed: "",
 };
 
