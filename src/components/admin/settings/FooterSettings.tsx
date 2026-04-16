@@ -43,12 +43,12 @@ const defaultFooter: FooterData = {
     { label: "FAQ", href: "/faq" },
   ],
   phone: "+88 01835 925510",
-  email: "support@techllect.com",
+  email: "support@besteshop.com",
   address: "Dhaka, Bangladesh",
-  facebook: "https://www.facebook.com/Techllect/",
+  facebook: "https://www.facebook.com/BestEShop/",
   instagram: "",
   youtube: "",
-  copyright: "© {year} Techllect. All rights reserved Ekrom Hossan (Software Developer)",
+  copyright: "© {year} Best E-Shop. All rights reserved Ekrom Hossan (Software Developer)",
 };
 
 const FooterSettings = () => {
