@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -17,6 +17,7 @@ import ReviewForm from "@/components/store/ReviewForm";
 
 const ProductDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { addItem } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
   const [product, setProduct] = useState<any>(null);
@@ -163,7 +164,7 @@ const ProductDetail = () => {
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <Button size="lg" className="flex-1 rounded-full" disabled={!(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) || (colorVariants.length > 0 && !selectedColor)} onClick={() => { addItem({ id: product.id, name: product.name, price: product.price, image: activeColorVariant?.image || images[0], slug: product.slug, color: selectedColor || undefined }, quantity); }}>
+                <Button size="lg" className="flex-1 rounded-full" disabled={!(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) || (colorVariants.length > 0 && !selectedColor)} onClick={() => { addItem({ id: product.id, name: product.name, price: product.price, image: activeColorVariant?.image || images[0], slug: product.slug, color: selectedColor || undefined }, quantity); navigate('/cart'); }}>
                   <ShoppingCart className="h-5 w-5 mr-2" />{(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) ? (colorVariants.length > 0 && !selectedColor ? "Select a Color" : "Add to Cart") : "Out of Stock"}
                 </Button>
                 <Button size="lg" variant="outline" className={`rounded-full ${isInWishlist(product.id) ? "text-destructive border-destructive" : ""}`} onClick={() => toggleItem(product.id)}>
