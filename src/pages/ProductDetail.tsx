@@ -17,6 +17,7 @@ import ReviewForm from "@/components/store/ReviewForm";
 
 const ProductDetail = () => {
   const { slug } = useParams();
+  const navigate = useNavigate();
   const { addItem } = useCart();
   const { toggleItem, isInWishlist } = useWishlist();
   const [product, setProduct] = useState<any>(null);
