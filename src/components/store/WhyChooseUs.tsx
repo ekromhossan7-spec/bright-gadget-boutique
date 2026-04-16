@@ -62,7 +62,7 @@ const WhyChooseUs = () => {
     <section className="py-12 sm:py-16">
       <div className="container">
         <div className="text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold mb-2">Why Techllect?</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-2">Why Best E-Shop?</h2>
           <p className="text-muted-foreground">See how we compare</p>
         </div>
 
@@ -76,7 +76,7 @@ const WhyChooseUs = () => {
           <div className="rounded-2xl border overflow-hidden">
             <div className="grid grid-cols-3 bg-primary text-primary-foreground p-4 text-sm font-semibold">
               <span>Feature</span>
-              <span className="text-center">Techllect</span>
+              <span className="text-center">Best E-Shop</span>
               <span className="text-center">Others</span>
             </div>
             {comparisons.map((item, i) => (

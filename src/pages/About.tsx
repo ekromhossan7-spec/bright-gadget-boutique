@@ -34,8 +34,8 @@ const About = () => {
   }, []);
 
   const d = {
-    hero_title: data?.hero_title || "About Techllect",
-    hero_description: data?.hero_description || "Techllect is a premium gadget destination in Bangladesh. We bring you the latest in technology — from smartphones and smartwatches to gaming gear and audio accessories — all backed by genuine warranty and exceptional service.",
+    hero_title: data?.hero_title || "About Best E-Shop",
+    hero_description: data?.hero_description || "Best E-Shop is a premium gadget destination in Bangladesh. We bring you the latest in technology — from smartphones and smartwatches to gaming gear and audio accessories — all backed by genuine warranty and exceptional service.",
     story_title: data?.story_title || "Our Story",
     story_p1: data?.story_p1 || "Founded with a passion for technology, Techllect started as a small venture to make premium gadgets accessible to everyone in Bangladesh.",
     story_p2: data?.story_p2 || "Today, we serve thousands of happy customers with a curated selection of the best tech products at competitive prices, backed by genuine warranty and dedicated support.",
@@ -54,8 +54,8 @@ const About = () => {
         <section className="bg-secondary/40 py-16 sm:py-24">
           <div className="container text-center max-w-3xl">
             <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-3xl sm:text-5xl font-bold mb-4">
-              {d.hero_title.includes("Techllect") ? (
-                <>{d.hero_title.split("Techllect")[0]}<span className="text-accent">Techllect</span>{d.hero_title.split("Techllect")[1]}</>
+              {d.hero_title.includes("Best E-Shop") ? (
+                <>{d.hero_title.split("Best E-Shop")[0]}<span className="text-accent">Best E-Shop</span>{d.hero_title.split("Best E-Shop")[1]}</>
               ) : d.hero_title}
             </motion.h1>
             <p className="text-muted-foreground text-lg leading-relaxed">{d.hero_description}</p>
@@ -127,7 +127,7 @@ const About = () => {
         {/* Values */}
         <section className="py-16 bg-secondary/30">
           <div className="container">
-            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Why Techllect?</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-center mb-12">Why Best E-Shop?</h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {values.map((v, i) => (
                 <motion.div key={v.title} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} viewport={{ once: true }} className="bg-background rounded-2xl p-6 border text-center">
