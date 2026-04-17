@@ -37,7 +37,7 @@ const About = () => {
     hero_title: data?.hero_title || "About Best E-Shop",
     hero_description: data?.hero_description || "Best E-Shop is a premium gadget destination in Bangladesh. We bring you the latest in technology — from smartphones and smartwatches to gaming gear and audio accessories — all backed by genuine warranty and exceptional service.",
     story_title: data?.story_title || "Our Story",
-    story_p1: data?.story_p1 || "Founded with a passion for technology, Techllect started as a small venture to make premium gadgets accessible to everyone in Bangladesh.",
+    story_p1: data?.story_p1 || "Founded with a passion for technology, Best E-Shop started as a small venture to make premium gadgets accessible to everyone in Bangladesh.",
     story_p2: data?.story_p2 || "Today, we serve thousands of happy customers with a curated selection of the best tech products at competitive prices, backed by genuine warranty and dedicated support.",
     story_image: data?.story_image || "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=600&h=400&fit=crop",
     mission: data?.mission || "",
