@@ -68,7 +68,7 @@ function AdminSidebar() {
           {!collapsed && (
             <div>
               <p className="font-bold text-sidebar-foreground text-sm">Admin Panel</p>
-              <p className="text-[11px] text-sidebar-foreground/50">Techllect Store</p>
+              <p className="text-[11px] text-sidebar-foreground/50">Best E-Shop Store</p>
             </div>
           )}
         </div>
@@ -223,7 +223,7 @@ const AdminLayout = () => {
         <div className="flex-1 flex flex-col">
           <header className="h-14 flex items-center border-b px-4 gap-3 bg-background sticky top-0 z-10">
             <SidebarTrigger />
-            <h1 className="font-bold text-lg">Techllect Admin</h1>
+            <h1 className="font-bold text-lg">Best E-Shop Admin</h1>
             <div className="ml-auto flex items-center gap-2">
               <Button variant="ghost" size="sm" asChild>
                 <Link to="/"><ArrowLeft className="h-4 w-4 mr-1" />Store</Link>

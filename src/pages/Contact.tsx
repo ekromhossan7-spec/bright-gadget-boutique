@@ -17,7 +17,7 @@ const Contact = () => {
     email: "support@besteshop.com",
     address: "Dhaka, Bangladesh",
     facebook_url: "https://www.facebook.com/BestEShop/",
-    facebook_label: "facebook.com/Techllect",
+    facebook_label: "facebook.com/BestEShop",
     maps_embed: "",
   });
 

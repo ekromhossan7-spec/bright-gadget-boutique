@@ -53,7 +53,7 @@ const Register = () => {
                 <UserPlus className="h-6 w-6 text-primary" />
               </div>
               <h1 className="text-2xl font-bold">Create Account</h1>
-              <p className="text-muted-foreground text-sm mt-1">Join Techllect today</p>
+              <p className="text-muted-foreground text-sm mt-1">Join Best E-Shop today</p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
