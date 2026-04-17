@@ -158,15 +158,15 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <Label>Price (৳) *</Label>
-                  <Input type="number" value={editProduct.price} onChange={(e) => setEditProduct({ ...editProduct, price: Number(e.target.value) })} />
+                  <Input type="number" min="0" step="any" value={editProduct.price === 0 ? "" : editProduct.price} onChange={(e) => setEditProduct({ ...editProduct, price: e.target.value === "" ? 0 : Number(e.target.value) })} />
                 </div>
                 <div>
                   <Label>Compare Price (৳)</Label>
-                  <Input type="number" value={editProduct.compare_price || ""} onChange={(e) => setEditProduct({ ...editProduct, compare_price: e.target.value ? Number(e.target.value) : null })} />
+                  <Input type="number" min="0" step="any" value={editProduct.compare_price ?? ""} onChange={(e) => setEditProduct({ ...editProduct, compare_price: e.target.value === "" ? null : Number(e.target.value) })} />
                 </div>
                 <div>
                   <Label>Purchase Price (৳) <span className="text-xs text-muted-foreground">(cost — for profit calc)</span></Label>
-                  <Input type="number" value={editProduct.purchase_price || 0} onChange={(e) => setEditProduct({ ...editProduct, purchase_price: Number(e.target.value) })} />
+                  <Input type="number" min="0" step="any" value={!editProduct.purchase_price ? "" : editProduct.purchase_price} onChange={(e) => setEditProduct({ ...editProduct, purchase_price: e.target.value === "" ? 0 : Number(e.target.value) })} />
                 </div>
                 <div>
                   <Label>SKU</Label>
@@ -174,7 +174,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <Label>Stock Quantity</Label>
-                  <Input type="number" value={editProduct.stock_quantity || 0} onChange={(e) => setEditProduct({ ...editProduct, stock_quantity: Number(e.target.value) })} />
+                  <Input type="number" min="0" value={!editProduct.stock_quantity ? "" : editProduct.stock_quantity} onChange={(e) => setEditProduct({ ...editProduct, stock_quantity: e.target.value === "" ? 0 : Number(e.target.value) })} />
                 </div>
                 <div>
                   <Label>Category</Label>
