@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useSearchParams } from "react-router-dom";
 
 const emptyProduct = {
-  name: "", slug: "", price: 0, compare_price: null as number | null,
+  name: "", slug: "", price: 0, compare_price: null as number | null, purchase_price: 0,
   description: "", short_description: "", sku: "",
   stock_quantity: 0, in_stock: true, featured: false,
   category_id: null as string | null, images: [] as string[], tags: [] as string[],
@@ -163,6 +163,10 @@ const AdminProducts = () => {
                 <div>
                   <Label>Compare Price (৳)</Label>
                   <Input type="number" value={editProduct.compare_price || ""} onChange={(e) => setEditProduct({ ...editProduct, compare_price: e.target.value ? Number(e.target.value) : null })} />
+                </div>
+                <div>
+                  <Label>Purchase Price (৳) <span className="text-xs text-muted-foreground">(cost — for profit calc)</span></Label>
+                  <Input type="number" value={editProduct.purchase_price || 0} onChange={(e) => setEditProduct({ ...editProduct, purchase_price: Number(e.target.value) })} />
                 </div>
                 <div>
                   <Label>SKU</Label>
