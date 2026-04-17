@@ -165,6 +165,10 @@ const AdminProducts = () => {
                   <Input type="number" value={editProduct.compare_price || ""} onChange={(e) => setEditProduct({ ...editProduct, compare_price: e.target.value ? Number(e.target.value) : null })} />
                 </div>
                 <div>
+                  <Label>Purchase Price (৳) <span className="text-xs text-muted-foreground">(cost — for profit calc)</span></Label>
+                  <Input type="number" value={editProduct.purchase_price || 0} onChange={(e) => setEditProduct({ ...editProduct, purchase_price: Number(e.target.value) })} />
+                </div>
+                <div>
                   <Label>SKU</Label>
                   <Input value={editProduct.sku || ""} onChange={(e) => setEditProduct({ ...editProduct, sku: e.target.value })} />
                 </div>
