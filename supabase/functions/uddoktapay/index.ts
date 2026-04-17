@@ -6,18 +6,41 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-const UDDOKTAPAY_BASE_URL = "https://techllect.paymently.io/api";
+const DEFAULT_BASE_URL = "https://techllect.paymently.io/api";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  const UDDOKTAPAY_API_KEY = Deno.env.get("UDDOKTAPAY_API_KEY");
-  if (!UDDOKTAPAY_API_KEY) {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  // Load admin-configured payment settings
+  let baseUrl = DEFAULT_BASE_URL;
+  let apiKey = Deno.env.get("UDDOKTAPAY_API_KEY") || "";
+  try {
+    const { data: row } = await supabase
+      .from("site_settings")
+      .select("value")
+      .eq("key", "payment_settings")
+      .maybeSingle();
+    const v = (row?.value ?? {}) as Record<string, any>;
+    if (typeof v.uddoktapay_api_url === "string" && v.uddoktapay_api_url.trim()) {
+      baseUrl = v.uddoktapay_api_url.trim().replace(/\/$/, "");
+    }
+    if (typeof v.uddoktapay_api_key === "string" && v.uddoktapay_api_key.trim()) {
+      apiKey = v.uddoktapay_api_key.trim();
+    }
+  } catch (_) {
+    // fall back to defaults / env
+  }
+
+  if (!apiKey) {
     return new Response(
-      JSON.stringify({ error: "UDDOKTAPAY_API_KEY not configured" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      JSON.stringify({ error: "UddoktaPay API key not configured. Set it in Admin → Settings → Payment Settings." }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
 
@@ -36,12 +59,12 @@ Deno.serve(async (req) => {
         );
       }
 
-      const response = await fetch(`${UDDOKTAPAY_BASE_URL}/checkout-v2`, {
+      const response = await fetch(`${baseUrl}/checkout-v2`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "RT-UDDOKTAPAY-API-KEY": UDDOKTAPAY_API_KEY,
+          "RT-UDDOKTAPAY-API-KEY": apiKey,
         },
         body: JSON.stringify({
           full_name,
@@ -72,12 +95,12 @@ Deno.serve(async (req) => {
         );
       }
 
-      const response = await fetch(`${UDDOKTAPAY_BASE_URL}/verify-payment`, {
+      const response = await fetch(`${baseUrl}/verify-payment`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
-          "RT-UDDOKTAPAY-API-KEY": UDDOKTAPAY_API_KEY,
+          "RT-UDDOKTAPAY-API-KEY": apiKey,
         },
         body: JSON.stringify({ invoice_id }),
       });
@@ -86,10 +109,6 @@ Deno.serve(async (req) => {
 
       // If payment is completed, update the order
       if (data.status === "COMPLETED" && data.metadata?.order_number) {
-        const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-        const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
         await supabase
           .from("orders")
           .update({
