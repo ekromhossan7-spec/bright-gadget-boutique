@@ -174,7 +174,7 @@ const AdminProducts = () => {
                 </div>
                 <div>
                   <Label>Stock Quantity</Label>
-                  <Input type="number" value={editProduct.stock_quantity || 0} onChange={(e) => setEditProduct({ ...editProduct, stock_quantity: Number(e.target.value) })} />
+                  <Input type="number" min="0" value={!editProduct.stock_quantity ? "" : editProduct.stock_quantity} onChange={(e) => setEditProduct({ ...editProduct, stock_quantity: e.target.value === "" ? 0 : Number(e.target.value) })} />
                 </div>
                 <div>
                   <Label>Category</Label>
