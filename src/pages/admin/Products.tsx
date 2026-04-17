@@ -16,7 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useSearchParams } from "react-router-dom";
 
 const emptyProduct = {
-  name: "", slug: "", price: 0, compare_price: null as number | null,
+  name: "", slug: "", price: 0, compare_price: null as number | null, purchase_price: 0,
   description: "", short_description: "", sku: "",
   stock_quantity: 0, in_stock: true, featured: false,
   category_id: null as string | null, images: [] as string[], tags: [] as string[],
