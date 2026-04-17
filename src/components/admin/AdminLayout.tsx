@@ -13,7 +13,7 @@ import {
   LayoutDashboard, Package, ShoppingCart, Users, Settings, CreditCard,
   Truck, Tag, FileText, BarChart3, ArrowLeft, ShieldAlert, ChevronDown,
   PlusCircle, FolderTree, MapPin, Store, LogOut, AlertTriangle, Activity,
-  MessageCircle,
+  MessageCircle, Eye,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -44,6 +44,7 @@ const productNav = {
 const bottomNav = [
   { title: "Pages", url: "/admin/pages", icon: FileText },
   { title: "Reports", url: "/admin/reports", icon: BarChart3 },
+  { title: "Visitor Analytics", url: "/admin/visitor-analytics", icon: Eye },
   { title: "Settings", url: "/admin/settings", icon: Settings },
 ];
 

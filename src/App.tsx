@@ -46,6 +46,8 @@ import AdminCategories from "./pages/admin/Categories";
 import AdminIncompleteOrders from "./pages/admin/IncompleteOrders";
 import AdminRecoveryAnalytics from "./pages/admin/RecoveryAnalytics";
 import AdminLiveChat from "./pages/admin/LiveChat";
+import AdminVisitorAnalytics from "./pages/admin/VisitorAnalytics";
+import PageTracker from "./components/PageTracker";
 
 const queryClient = new QueryClient();
 
@@ -58,6 +60,7 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter basename={import.meta.env.BASE_URL}>
+              <PageTracker />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/shop" element={<Shop />} />
@@ -98,6 +101,7 @@ const App = () => (
                   <Route path="incomplete-orders" element={<AdminIncompleteOrders />} />
                   <Route path="recovery-analytics" element={<AdminRecoveryAnalytics />} />
                   <Route path="live-chat" element={<AdminLiveChat />} />
+                  <Route path="visitor-analytics" element={<AdminVisitorAnalytics />} />
                 </Route>
 
                 <Route path="*" element={<NotFound />} />
