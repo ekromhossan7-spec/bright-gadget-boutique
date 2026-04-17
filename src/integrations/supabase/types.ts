@@ -358,6 +358,7 @@ export type Database = {
           in_stock: boolean | null
           name: string
           price: number
+          purchase_price: number | null
           short_description: string | null
           sku: string | null
           slug: string
@@ -378,6 +379,7 @@ export type Database = {
           in_stock?: boolean | null
           name: string
           price: number
+          purchase_price?: number | null
           short_description?: string | null
           sku?: string | null
           slug: string
@@ -398,6 +400,7 @@ export type Database = {
           in_stock?: boolean | null
           name?: string
           price?: number
+          purchase_price?: number | null
           short_description?: string | null
           sku?: string | null
           slug?: string
