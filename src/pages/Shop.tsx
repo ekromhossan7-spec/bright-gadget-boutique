@@ -1,3 +1,4 @@
+import { NO_IMAGE } from "@/lib/placeholder";
 import { useState, useMemo, useEffect, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -283,7 +284,7 @@ const Shop = () => {
                       slug={product.slug}
                       price={product.price}
                       comparePrice={product.compare_price}
-                      image={product.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80"}
+                      image={product.images?.[0] || NO_IMAGE}
                       inStock={product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)}
                     />
                   ))}

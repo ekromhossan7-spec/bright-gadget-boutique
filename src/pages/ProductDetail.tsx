@@ -1,3 +1,4 @@
+import { NO_IMAGE } from "@/lib/placeholder";
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -75,7 +76,7 @@ const ProductDetail = () => {
   const activeColorVariant = colorVariants.find((c: any) => c.name === selectedColor);
   const images = activeColorVariant?.image
     ? [activeColorVariant.image, ...(product.images?.length ? product.images : [])]
-    : product.images?.length ? product.images : ["https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600"];
+    : product.images?.length ? product.images : [NO_IMAGE];
   const discount = product.compare_price ? Math.round(((product.compare_price - product.price) / product.compare_price) * 100) : 0;
   const avgRating = reviews.length ? (reviews.reduce((s: number, r: any) => s + r.rating, 0) / reviews.length).toFixed(1) : "0";
 
@@ -230,7 +231,7 @@ const ProductDetail = () => {
               <h2 className="text-2xl font-bold mb-6">Related Products</h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                 {related.map((p) => (
-                  <ProductCard key={p.id} id={p.id} name={p.name} slug={p.slug} price={p.price} comparePrice={p.compare_price} image={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400"} inStock={p.in_stock !== false && (p.stock_quantity === null || p.stock_quantity > 0)} />
+                  <ProductCard key={p.id} id={p.id} name={p.name} slug={p.slug} price={p.price} comparePrice={p.compare_price} image={p.images?.[0] || NO_IMAGE} inStock={p.in_stock !== false && (p.stock_quantity === null || p.stock_quantity > 0)} />
                 ))}
               </div>
             </section>

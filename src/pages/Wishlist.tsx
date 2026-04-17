@@ -1,3 +1,4 @@
+import { NO_IMAGE } from "@/lib/placeholder";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -47,7 +48,7 @@ const Wishlist = () => {
               {products.map((p) => (
                 <div key={p.id} className="border rounded-xl p-4 flex items-center gap-4">
                   <Link to={`/product/${p.slug}`}>
-                    <img src={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=200"} alt={p.name} className="w-20 h-20 rounded-lg object-cover" />
+                    <img src={p.images?.[0] || NO_IMAGE} alt={p.name} className="w-20 h-20 rounded-lg object-cover" />
                   </Link>
                   <div className="flex-1 min-w-0">
                     <Link to={`/product/${p.slug}`} className="font-medium hover:text-accent line-clamp-1">{p.name}</Link>

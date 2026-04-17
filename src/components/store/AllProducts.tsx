@@ -1,3 +1,4 @@
+import { NO_IMAGE } from "@/lib/placeholder";
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -111,7 +112,7 @@ const AllProducts = () => {
                     slug={p.slug}
                     price={p.price}
                     comparePrice={p.compare_price}
-                    image={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80"}
+                    image={p.images?.[0] || NO_IMAGE}
                     inStock={p.in_stock !== false && (p.stock_quantity === null || p.stock_quantity > 0)}
                   />
                 ))}
@@ -137,7 +138,7 @@ const AllProducts = () => {
                   slug={p.slug}
                   price={p.price}
                   comparePrice={p.compare_price}
-                  image={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=400&fit=crop&q=80"}
+                  image={p.images?.[0] || NO_IMAGE}
                   inStock={p.in_stock !== false && (p.stock_quantity === null || p.stock_quantity > 0)}
                 />
               ))}

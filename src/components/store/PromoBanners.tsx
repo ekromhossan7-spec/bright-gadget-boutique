@@ -1,3 +1,4 @@
+import { NO_IMAGE } from "@/lib/placeholder";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ interface PromoBanner {
 }
 
 const defaultBanners: PromoBanner[] = [
-  { title: "Up to 40% Off\nAudio Gear", label: "Limited Offer", linkText: "Shop Audio →", linkUrl: "/shop?category=headphones", imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&h=400&fit=crop", variant: "primary" },
+  { title: "Up to 40% Off\nAudio Gear", label: "Limited Offer", linkText: "Shop Audio →", linkUrl: "/shop?category=headphones", imageUrl: NO_IMAGE, variant: "primary" },
   { title: "Smart Wearables\nCollection", label: "New Arrivals", linkText: "Explore Now →", linkUrl: "/shop?category=smartwatches", imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&h=400&fit=crop", variant: "secondary" },
 ];
 
