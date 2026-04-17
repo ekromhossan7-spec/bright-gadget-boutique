@@ -1,3 +1,4 @@
+import { NO_IMAGE } from "@/lib/placeholder";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -183,7 +184,7 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
                   const hasColors = Array.isArray(p.color_variants) && p.color_variants.length > 0;
                   return (
                     <button key={p.id} className="w-full flex items-center gap-3 p-2 hover:bg-secondary text-left text-sm" onClick={() => handleProductClick(p)}>
-                      <img src={p.images?.[0] || "/placeholder.svg"} alt="" className="w-8 h-8 rounded object-cover" />
+                      <img src={p.images?.[0] || NO_IMAGE} alt="" className="w-8 h-8 rounded object-cover" />
                       <span className="flex-1">{p.name}</span>
                       {hasColors && <Badge variant="outline" className="text-[10px]">Choose color</Badge>}
                       {!p.in_stock && <Badge variant="destructive" className="text-[10px]">Out of Stock</Badge>}

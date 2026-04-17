@@ -1,3 +1,4 @@
+import { NO_IMAGE } from "@/lib/placeholder";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
@@ -114,7 +115,7 @@ const AdminProducts = () => {
               <tr key={p.id} className="border-b hover:bg-secondary/30 transition-colors">
                 <td className="p-3">
                   <div className="flex items-center gap-3">
-                    <img src={p.images?.[0] || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100"} alt="" className="w-10 h-10 rounded-lg object-cover" />
+                    <img src={p.images?.[0] || NO_IMAGE} alt="" className="w-10 h-10 rounded-lg object-cover" />
                     <div>
                       <p className="font-medium line-clamp-1">{p.name}</p>
                       <p className="text-xs text-muted-foreground">{p.sku || "No SKU"}</p>

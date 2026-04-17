@@ -1,3 +1,4 @@
+import { NO_IMAGE } from "@/lib/placeholder";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -120,7 +121,7 @@ const MyReviews = () => {
                 const existingReview = myReviews.find((r) => r.product_id === product.id);
                 return (
                   <div key={product.id} className="border rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    <img src={product.image || "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=100"} alt={product.name} className="w-16 h-16 rounded-lg object-cover" />
+                    <img src={product.image || NO_IMAGE} alt={product.name} className="w-16 h-16 rounded-lg object-cover" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium line-clamp-1">{product.name}</p>
                       {reviewed && existingReview ? (
