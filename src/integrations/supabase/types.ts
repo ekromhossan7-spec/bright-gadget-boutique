@@ -390,6 +390,7 @@ export type Database = {
           price: number
           purchase_price: number | null
           short_description: string | null
+          sizes: string[] | null
           sku: string | null
           slug: string
           specifications: Json | null
@@ -411,6 +412,7 @@ export type Database = {
           price: number
           purchase_price?: number | null
           short_description?: string | null
+          sizes?: string[] | null
           sku?: string | null
           slug: string
           specifications?: Json | null
@@ -432,6 +434,7 @@ export type Database = {
           price?: number
           purchase_price?: number | null
           short_description?: string | null
+          sizes?: string[] | null
           sku?: string | null
           slug?: string
           specifications?: Json | null
