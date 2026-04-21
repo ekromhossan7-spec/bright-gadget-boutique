@@ -104,7 +104,7 @@ const OrderSuccess = () => {
                       <img src={item.image} alt={item.name} className="w-12 h-12 rounded-lg object-cover bg-secondary" />
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm line-clamp-1">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">Qty: {item.quantity}{item.color ? ` · ${item.color}` : ''}</p>
+                        <p className="text-xs text-muted-foreground">Qty: {item.quantity}{item.color ? ` · ${item.color}` : ''}{item.size ? ` · Size ${item.size}` : ''}</p>
                       </div>
                       <span className="font-medium text-sm">৳{(item.price * item.quantity).toLocaleString()}</span>
                     </div>
