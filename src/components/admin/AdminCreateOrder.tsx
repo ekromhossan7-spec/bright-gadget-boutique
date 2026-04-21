@@ -27,6 +27,8 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
   const [shippingZone, setShippingZone] = useState("inside_dhaka");
   const [shippingRates, setShippingRates] = useState({ inside_dhaka: 60, outside_dhaka: 120 });
   const [colorPickerProduct, setColorPickerProduct] = useState<any>(null);
+  const [pickerColor, setPickerColor] = useState<{ name?: string; image?: string } | null>(null);
+  const [pickerSize, setPickerSize] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -54,12 +56,12 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
     (p.sku || "").toLowerCase().includes(productSearch.toLowerCase())
   );
 
-  const addProductWithColor = (product: any, color?: string, image?: string) => {
+  const addProductWithVariants = (product: any, color?: string, image?: string, size?: string) => {
     if (!product.in_stock) {
       toast.error(`"${product.name}" is out of stock`);
       return;
     }
-    const itemKey = `${product.id}-${color || ""}`;
+    const itemKey = `${product.id}-${color || ""}-${size || ""}`;
     const existing = orderItems.find(i => i.itemKey === itemKey);
     if (existing) {
       setOrderItems(prev => prev.map(i => i.itemKey === itemKey ? { ...i, quantity: i.quantity + 1 } : i));
@@ -72,18 +74,35 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
         image: image || product.images?.[0] || "",
         quantity: 1,
         color: color || undefined,
+        size: size || undefined,
       }]);
     }
   };
 
   const handleProductClick = (product: any) => {
-    const variants = Array.isArray(product.color_variants) ? product.color_variants : [];
-    if (variants.length > 0) {
+    const colors = Array.isArray(product.color_variants) ? product.color_variants : [];
+    const sizes = Array.isArray(product.sizes) ? product.sizes.filter((s: any) => s) : [];
+    if (colors.length > 0 || sizes.length > 0) {
       setColorPickerProduct(product);
+      setPickerColor(null);
+      setPickerSize(null);
     } else {
-      addProductWithColor(product);
+      addProductWithVariants(product);
       setProductSearch("");
     }
+  };
+
+  const confirmPicker = () => {
+    if (!colorPickerProduct) return;
+    const colors = Array.isArray(colorPickerProduct.color_variants) ? colorPickerProduct.color_variants : [];
+    const sizes = Array.isArray(colorPickerProduct.sizes) ? colorPickerProduct.sizes.filter((s: any) => s) : [];
+    if (colors.length > 0 && !pickerColor) { toast.error("Please select a color"); return; }
+    if (sizes.length > 0 && !pickerSize) { toast.error("Please select a size"); return; }
+    addProductWithVariants(colorPickerProduct, pickerColor?.name, pickerColor?.image, pickerSize || undefined);
+    setColorPickerProduct(null);
+    setPickerColor(null);
+    setPickerSize(null);
+    setProductSearch("");
   };
 
   const updateQty = (itemKey: string, qty: number) => {
