@@ -137,40 +137,66 @@ const ProductDetail = () => {
                 <Badge variant="outline" className="border-destructive text-destructive">Out of Stock</Badge>
               )}
 
-              {/* Color Variants */}
-              {colorVariants.length > 0 && (
-                <div>
-                  <span className="text-sm font-medium mb-2 block">Color: {selectedColor || "Select a color"}</span>
-                  <div className="flex gap-2 flex-wrap">
-                    {colorVariants.map((cv: any) => (
-                      <button
-                        key={cv.name}
-                        onClick={() => { setSelectedColor(cv.name); setSelectedImage(0); }}
-                        className={`w-9 h-9 rounded-full border-2 transition-all ${selectedColor === cv.name ? "border-accent scale-110 ring-2 ring-accent/30" : "border-muted hover:border-foreground/50"}`}
-                        style={{ backgroundColor: cv.hex }}
-                        title={cv.name}
-                      />
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Color & Size — professional panel */}
+              {(colorVariants.length > 0 || sizes.length > 0) && (
+                <div className="rounded-2xl border bg-gradient-to-br from-secondary/40 to-background p-4 sm:p-5 space-y-4 shadow-sm">
+                  {colorVariants.length > 0 && (
+                    <div>
+                      <div className="flex items-baseline justify-between mb-2.5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Color</span>
+                        <span className="text-sm font-medium text-foreground">{selectedColor || <span className="text-muted-foreground italic">Choose one</span>}</span>
+                      </div>
+                      <div className="flex gap-2.5 flex-wrap">
+                        {colorVariants.map((cv: any) => {
+                          const active = selectedColor === cv.name;
+                          return (
+                            <button
+                              key={cv.name}
+                              onClick={() => { setSelectedColor(cv.name); setSelectedImage(0); }}
+                              aria-label={cv.name}
+                              aria-pressed={active}
+                              title={cv.name}
+                              className={`relative w-10 h-10 rounded-full transition-all duration-200 ${active ? "ring-2 ring-accent ring-offset-2 ring-offset-background scale-110 shadow-md" : "ring-1 ring-border hover:ring-foreground/40 hover:scale-105"}`}
+                              style={{ backgroundColor: cv.hex }}
+                            >
+                              {active && (
+                                <span className="absolute inset-0 flex items-center justify-center">
+                                  <svg className="w-4 h-4 drop-shadow" viewBox="0 0 20 20" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="4 11 8 15 16 6" /></svg>
+                                </span>
+                              )}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
 
-              {/* Size Variants */}
-              {sizes.length > 0 && (
-                <div>
-                  <span className="text-sm font-medium mb-2 block">Size: {selectedSize || "Select a size"}</span>
-                  <div className="flex gap-2 flex-wrap">
-                    {sizes.map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setSelectedSize(s)}
-                        className={`min-w-[44px] h-10 px-3 rounded-lg border-2 text-sm font-medium transition-all ${selectedSize === s ? "border-accent bg-accent/10 text-accent" : "border-muted hover:border-foreground/50"}`}
-                      >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
+                  {colorVariants.length > 0 && sizes.length > 0 && <div className="h-px bg-border/60" />}
+
+                  {sizes.length > 0 && (
+                    <div>
+                      <div className="flex items-baseline justify-between mb-2.5">
+                        <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Size</span>
+                        <span className="text-sm font-medium text-foreground">{selectedSize || <span className="text-muted-foreground italic">Choose one</span>}</span>
+                      </div>
+                      <div className="flex gap-2 flex-wrap">
+                        {sizes.map((s) => {
+                          const active = selectedSize === s;
+                          return (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => setSelectedSize(s)}
+                              aria-pressed={active}
+                              className={`min-w-[48px] h-11 px-4 rounded-xl text-sm font-semibold transition-all duration-200 ${active ? "bg-accent text-accent-foreground border-2 border-accent shadow-md scale-105" : "bg-background border-2 border-border text-foreground hover:border-accent/60 hover:bg-accent/5"}`}
+                            >
+                              {s}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
