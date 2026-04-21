@@ -425,7 +425,11 @@ const AdminOrders = () => {
                   <div key={i} className="flex justify-between py-1.5 border-b last:border-0">
                     <span className="text-muted-foreground">
                       {item.name}
-                      {item.color && <Badge variant="outline" className="ml-1.5 text-[10px] px-1.5 py-0">{item.color}</Badge>}
+                      {(item.color || item.size) && (
+                        <Badge variant="outline" className="ml-1.5 text-[10px] px-1.5 py-0">
+                          {[item.color, item.size].filter(Boolean).join(", ")}
+                        </Badge>
+                      )}
                       {" "}× {item.quantity}
                     </span>
                     <span className="font-medium">৳{(item.price * item.quantity).toLocaleString()}</span>

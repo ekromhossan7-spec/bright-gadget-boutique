@@ -97,7 +97,14 @@ const SingleInvoice = ({ order, config }: { order: any; config: InvoiceConfig })
           {items.map((item: any, i: number) => (
             <tr key={i}>
               <td style={{ padding: "10px 12px", borderBottom: "1px solid #eee" }}>{i + 1}</td>
-              <td style={{ padding: "10px 12px", borderBottom: "1px solid #eee" }}>{item.name}</td>
+              <td style={{ padding: "10px 12px", borderBottom: "1px solid #eee" }}>
+                {item.name}
+                {(item.color || item.size) && (
+                  <span style={{ display: "block", fontSize: 11, color: "#888", marginTop: 2 }}>
+                    {[item.color && `Color: ${item.color}`, item.size && `Size: ${item.size}`].filter(Boolean).join(" · ")}
+                  </span>
+                )}
+              </td>
               <td style={{ padding: "10px 12px", borderBottom: "1px solid #eee", textAlign: "center" }}>{item.quantity}</td>
               <td style={{ padding: "10px 12px", borderBottom: "1px solid #eee", textAlign: "right" }}>৳{Number(item.price).toLocaleString()}</td>
               <td style={{ padding: "10px 12px", borderBottom: "1px solid #eee", textAlign: "right" }}>৳{(item.price * item.quantity).toLocaleString()}</td>

@@ -28,6 +28,7 @@ const ProductDetail = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedSize, setSelectedSize] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -73,6 +74,7 @@ const ProductDetail = () => {
   }
 
   const colorVariants = Array.isArray((product as any).color_variants) ? (product as any).color_variants : [];
+  const sizes: string[] = Array.isArray((product as any).sizes) ? (product as any).sizes.filter((s: any) => s) : [];
   const activeColorVariant = colorVariants.find((c: any) => c.name === selectedColor);
   const images = activeColorVariant?.image
     ? [activeColorVariant.image, ...(product.images?.length ? product.images : [])]
@@ -153,6 +155,25 @@ const ProductDetail = () => {
                 </div>
               )}
 
+              {/* Size Variants */}
+              {sizes.length > 0 && (
+                <div>
+                  <span className="text-sm font-medium mb-2 block">Size: {selectedSize || "Select a size"}</span>
+                  <div className="flex gap-2 flex-wrap">
+                    {sizes.map((s) => (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => setSelectedSize(s)}
+                        className={`min-w-[44px] h-10 px-3 rounded-lg border-2 text-sm font-medium transition-all ${selectedSize === s ? "border-accent bg-accent/10 text-accent" : "border-muted hover:border-foreground/50"}`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Quantity */}
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium">Quantity:</span>
@@ -165,8 +186,8 @@ const ProductDetail = () => {
 
               {/* Actions */}
               <div className="flex gap-3 pt-2">
-                <Button size="lg" className="flex-1 rounded-full" disabled={!(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) || (colorVariants.length > 0 && !selectedColor)} onClick={() => { addItem({ id: product.id, name: product.name, price: product.price, image: activeColorVariant?.image || images[0], slug: product.slug, color: selectedColor || undefined }, quantity); navigate('/cart'); }}>
-                  <ShoppingCart className="h-5 w-5 mr-2" />{(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) ? (colorVariants.length > 0 && !selectedColor ? "Select a Color" : "Add to Cart") : "Out of Stock"}
+                <Button size="lg" className="flex-1 rounded-full" disabled={!(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) || (colorVariants.length > 0 && !selectedColor) || (sizes.length > 0 && !selectedSize)} onClick={() => { addItem({ id: product.id, name: product.name, price: product.price, image: activeColorVariant?.image || images[0], slug: product.slug, color: selectedColor || undefined, size: selectedSize || undefined }, quantity); navigate('/cart'); }}>
+                  <ShoppingCart className="h-5 w-5 mr-2" />{(product.in_stock !== false && (product.stock_quantity === null || product.stock_quantity > 0)) ? (colorVariants.length > 0 && !selectedColor ? "Select a Color" : sizes.length > 0 && !selectedSize ? "Select a Size" : "Add to Cart") : "Out of Stock"}
                 </Button>
                 <Button size="lg" variant="outline" className={`rounded-full ${isInWishlist(product.id) ? "text-destructive border-destructive" : ""}`} onClick={() => toggleItem(product.id)}>
                   <Heart className={`h-5 w-5 ${isInWishlist(product.id) ? "fill-destructive" : ""}`} />

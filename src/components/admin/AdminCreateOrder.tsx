@@ -27,6 +27,8 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
   const [shippingZone, setShippingZone] = useState("inside_dhaka");
   const [shippingRates, setShippingRates] = useState({ inside_dhaka: 60, outside_dhaka: 120 });
   const [colorPickerProduct, setColorPickerProduct] = useState<any>(null);
+  const [pickerColor, setPickerColor] = useState<{ name?: string; image?: string } | null>(null);
+  const [pickerSize, setPickerSize] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -54,12 +56,12 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
     (p.sku || "").toLowerCase().includes(productSearch.toLowerCase())
   );
 
-  const addProductWithColor = (product: any, color?: string, image?: string) => {
+  const addProductWithVariants = (product: any, color?: string, image?: string, size?: string) => {
     if (!product.in_stock) {
       toast.error(`"${product.name}" is out of stock`);
       return;
     }
-    const itemKey = `${product.id}-${color || ""}`;
+    const itemKey = `${product.id}-${color || ""}-${size || ""}`;
     const existing = orderItems.find(i => i.itemKey === itemKey);
     if (existing) {
       setOrderItems(prev => prev.map(i => i.itemKey === itemKey ? { ...i, quantity: i.quantity + 1 } : i));
@@ -72,18 +74,35 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
         image: image || product.images?.[0] || "",
         quantity: 1,
         color: color || undefined,
+        size: size || undefined,
       }]);
     }
   };
 
   const handleProductClick = (product: any) => {
-    const variants = Array.isArray(product.color_variants) ? product.color_variants : [];
-    if (variants.length > 0) {
+    const colors = Array.isArray(product.color_variants) ? product.color_variants : [];
+    const sizes = Array.isArray(product.sizes) ? product.sizes.filter((s: any) => s) : [];
+    if (colors.length > 0 || sizes.length > 0) {
       setColorPickerProduct(product);
+      setPickerColor(null);
+      setPickerSize(null);
     } else {
-      addProductWithColor(product);
+      addProductWithVariants(product);
       setProductSearch("");
     }
+  };
+
+  const confirmPicker = () => {
+    if (!colorPickerProduct) return;
+    const colors = Array.isArray(colorPickerProduct.color_variants) ? colorPickerProduct.color_variants : [];
+    const sizes = Array.isArray(colorPickerProduct.sizes) ? colorPickerProduct.sizes.filter((s: any) => s) : [];
+    if (colors.length > 0 && !pickerColor) { toast.error("Please select a color"); return; }
+    if (sizes.length > 0 && !pickerSize) { toast.error("Please select a size"); return; }
+    addProductWithVariants(colorPickerProduct, pickerColor?.name, pickerColor?.image, pickerSize || undefined);
+    setColorPickerProduct(null);
+    setPickerColor(null);
+    setPickerSize(null);
+    setProductSearch("");
   };
 
   const updateQty = (itemKey: string, qty: number) => {
@@ -105,7 +124,7 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
         order_number: orderNumber,
         guest_email: form.email || null,
         guest_phone: form.phone,
-        items: orderItems.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image, color: i.color })),
+        items: orderItems.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity, image: i.image, ...(i.color ? { color: i.color } : {}), ...(i.size ? { size: i.size } : {}) })),
         subtotal,
         delivery_charge: Number(deliveryCharge || 0),
         total,
@@ -182,11 +201,13 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
               <div className="border rounded-lg max-h-40 overflow-y-auto mb-3">
                 {filteredProducts.slice(0, 10).map(p => {
                   const hasColors = Array.isArray(p.color_variants) && p.color_variants.length > 0;
+                  const hasSizes = Array.isArray(p.sizes) && p.sizes.filter((s: any) => s).length > 0;
                   return (
                     <button key={p.id} className="w-full flex items-center gap-3 p-2 hover:bg-secondary text-left text-sm" onClick={() => handleProductClick(p)}>
                       <img src={p.images?.[0] || NO_IMAGE} alt="" className="w-8 h-8 rounded object-cover" />
                       <span className="flex-1">{p.name}</span>
-                      {hasColors && <Badge variant="outline" className="text-[10px]">Choose color</Badge>}
+                      {hasColors && <Badge variant="outline" className="text-[10px]">Color</Badge>}
+                      {hasSizes && <Badge variant="outline" className="text-[10px]">Size</Badge>}
                       {!p.in_stock && <Badge variant="destructive" className="text-[10px]">Out of Stock</Badge>}
                       <span className="font-medium">৳{p.price.toLocaleString()}</span>
                     </button>
@@ -196,31 +217,65 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
               </div>
             )}
 
-            {/* Color picker for selected product */}
-            {colorPickerProduct && (
-              <div className="border rounded-lg p-3 mb-3 bg-secondary/30">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm font-medium">Select color for "{colorPickerProduct.name}"</p>
-                  <Button size="sm" variant="ghost" onClick={() => setColorPickerProduct(null)}>Cancel</Button>
+            {/* Variant picker for selected product */}
+            {colorPickerProduct && (() => {
+              const colors = Array.isArray(colorPickerProduct.color_variants) ? colorPickerProduct.color_variants : [];
+              const sizes: string[] = Array.isArray(colorPickerProduct.sizes) ? colorPickerProduct.sizes.filter((s: any) => s) : [];
+              return (
+                <div className="border rounded-lg p-3 mb-3 bg-secondary/30 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <p className="text-sm font-medium">Select variant for "{colorPickerProduct.name}"</p>
+                    <Button size="sm" variant="ghost" onClick={() => { setColorPickerProduct(null); setPickerColor(null); setPickerSize(null); }}>Cancel</Button>
+                  </div>
+
+                  {colors.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium mb-1.5">Color {pickerColor?.name && <span className="text-muted-foreground">— {pickerColor.name}</span>}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {colors.map((cv: any, i: number) => {
+                          const name = cv.name || cv.color;
+                          const active = pickerColor?.name === name;
+                          return (
+                            <button
+                              key={i}
+                              type="button"
+                              className={`flex items-center gap-2 border-2 rounded-lg px-3 py-1.5 text-sm transition-colors ${active ? "border-accent bg-accent/10" : "border-muted hover:bg-background"}`}
+                              onClick={() => setPickerColor({ name, image: cv.image })}
+                            >
+                              {cv.image && <img src={cv.image} alt="" className="w-6 h-6 rounded object-cover" />}
+                              <span>{name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  {sizes.length > 0 && (
+                    <div>
+                      <p className="text-xs font-medium mb-1.5">Size {pickerSize && <span className="text-muted-foreground">— {pickerSize}</span>}</p>
+                      <div className="flex flex-wrap gap-2">
+                        {sizes.map((s) => {
+                          const active = pickerSize === s;
+                          return (
+                            <button
+                              key={s}
+                              type="button"
+                              onClick={() => setPickerSize(s)}
+                              className={`min-w-[40px] h-9 px-3 rounded-lg border-2 text-sm font-medium transition-colors ${active ? "border-accent bg-accent/10 text-accent" : "border-muted hover:bg-background"}`}
+                            >
+                              {s}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+
+                  <Button size="sm" onClick={confirmPicker} className="w-full">Add to order</Button>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {(colorPickerProduct.color_variants as any[]).map((cv, i) => (
-                    <button
-                      key={i}
-                      className="flex items-center gap-2 border rounded-lg px-3 py-2 hover:bg-background text-sm"
-                      onClick={() => {
-                        addProductWithColor(colorPickerProduct, cv.name || cv.color, cv.image);
-                        setColorPickerProduct(null);
-                        setProductSearch("");
-                      }}
-                    >
-                      {cv.image && <img src={cv.image} alt="" className="w-6 h-6 rounded object-cover" />}
-                      <span>{cv.name || cv.color}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+              );
+            })()}
 
             {/* Selected Items */}
             {orderItems.length > 0 && (
@@ -229,7 +284,13 @@ const AdminCreateOrder = ({ open, onOpenChange, onCreated }: Props) => {
                   <div key={item.itemKey} className="flex items-center gap-3 p-3">
                     <div className="flex-1">
                       <p className="text-sm font-medium">{item.name}</p>
-                      {item.color && <p className="text-xs text-muted-foreground">Color: {item.color}</p>}
+                      {(item.color || item.size) && (
+                        <p className="text-xs text-muted-foreground">
+                          {item.color && <>Color: {item.color}</>}
+                          {item.color && item.size && " · "}
+                          {item.size && <>Size: {item.size}</>}
+                        </p>
+                      )}
                     </div>
                     <div className="flex items-center gap-1">
                       <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => updateQty(item.itemKey, item.quantity - 1)}><Minus className="h-3 w-3" /></Button>
