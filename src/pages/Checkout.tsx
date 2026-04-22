@@ -31,7 +31,7 @@ const Checkout = () => {
   const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
   const [shippingRates, setShippingRates] = useState({ inside_dhaka: 60, outside_dhaka: 120, free_threshold: 5000 });
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_type: string; discount_value: number; id: string } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_type: string; discount_value: number; id: string; applies_to: string; product_ids: string[] } | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
   const [codEnabled, setCodEnabled] = useState(true);
   const [uddoktapayEnabled, setUddoktapayEnabled] = useState(true);
