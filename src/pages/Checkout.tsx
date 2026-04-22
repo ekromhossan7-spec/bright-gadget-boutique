@@ -31,7 +31,7 @@ const Checkout = () => {
   const [freeDeliveryEnabled, setFreeDeliveryEnabled] = useState(false);
   const [shippingRates, setShippingRates] = useState({ inside_dhaka: 60, outside_dhaka: 120, free_threshold: 5000 });
   const [couponCode, setCouponCode] = useState("");
-  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_type: string; discount_value: number; id: string } | null>(null);
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount_type: string; discount_value: number; id: string; applies_to: string; product_ids: string[] } | null>(null);
   const [couponLoading, setCouponLoading] = useState(false);
   const [codEnabled, setCodEnabled] = useState(true);
   const [uddoktapayEnabled, setUddoktapayEnabled] = useState(true);
@@ -71,10 +71,18 @@ const Checkout = () => {
   }, []);
 
   const deliveryCharge = freeDeliveryEnabled ? 0 : (totalPrice >= shippingRates.free_threshold ? 0 : shippingZone === "inside_dhaka" ? shippingRates.inside_dhaka : shippingRates.outside_dhaka);
+
+  // Subtotal of items eligible for the applied coupon
+  const eligibleSubtotal = appliedCoupon
+    ? appliedCoupon.applies_to === "specific"
+      ? items.reduce((sum, i) => sum + (appliedCoupon.product_ids.includes(i.id) ? i.price * i.quantity : 0), 0)
+      : totalPrice
+    : 0;
+
   const couponDiscount = appliedCoupon
     ? appliedCoupon.discount_type === "percentage"
-      ? Math.round(totalPrice * appliedCoupon.discount_value / 100)
-      : Math.min(appliedCoupon.discount_value, totalPrice)
+      ? Math.round(eligibleSubtotal * appliedCoupon.discount_value / 100)
+      : Math.min(appliedCoupon.discount_value, eligibleSubtotal)
     : 0;
   const discountedSubtotal = Math.max(0, totalPrice - couponDiscount);
   const partialPayment = paymentMethod === "partial" ? Math.ceil((discountedSubtotal + deliveryCharge) * (partialPercent / 100)) : 0;
@@ -97,7 +105,24 @@ const Checkout = () => {
     if (data.max_uses && data.used_count >= data.max_uses) { toast.error("This coupon has reached its usage limit"); return; }
     if (data.min_order_amount && totalPrice < data.min_order_amount) { toast.error(`Minimum order ৳${data.min_order_amount} required`); return; }
 
-    setAppliedCoupon({ code: data.code, discount_type: data.discount_type, discount_value: data.discount_value, id: data.id });
+    const appliesTo = (data as any).applies_to || "all";
+    const productIds: string[] = (data as any).product_ids || [];
+    if (appliesTo === "specific") {
+      const hasEligible = items.some((i) => productIds.includes(i.id));
+      if (!hasEligible) {
+        toast.error("This coupon is not valid for any item in your cart");
+        return;
+      }
+    }
+
+    setAppliedCoupon({
+      code: data.code,
+      discount_type: data.discount_type,
+      discount_value: data.discount_value,
+      id: data.id,
+      applies_to: appliesTo,
+      product_ids: productIds,
+    });
     toast.success(`Coupon "${data.code}" applied!`);
   };
 

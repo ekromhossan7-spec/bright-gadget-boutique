@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,9 +7,12 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Plus, Pencil, Trash2, Tag, Copy } from "lucide-react";
+import { Plus, Pencil, Trash2, Tag, Copy, Check, X, Search } from "lucide-react";
 
 interface Coupon {
   id: string;
@@ -23,6 +26,14 @@ interface Coupon {
   starts_at: string | null;
   expires_at: string | null;
   created_at: string;
+  applies_to: string;
+  product_ids: string[] | null;
+}
+
+interface ProductLite {
+  id: string;
+  name: string;
+  slug: string;
 }
 
 const emptyCoupon = {
@@ -34,15 +45,19 @@ const emptyCoupon = {
   active: true,
   starts_at: "",
   expires_at: "",
+  applies_to: "all",
+  product_ids: [] as string[],
 };
 
 const AdminCoupons = () => {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
+  const [products, setProducts] = useState<ProductLite[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<string | null>(null);
   const [form, setForm] = useState({ ...emptyCoupon });
   const [saving, setSaving] = useState(false);
+  const [productPickerOpen, setProductPickerOpen] = useState(false);
 
   const fetchCoupons = async () => {
     setLoading(true);
@@ -51,11 +66,26 @@ const AdminCoupons = () => {
     setLoading(false);
   };
 
-  useEffect(() => { fetchCoupons(); }, []);
+  const fetchProducts = async () => {
+    const { data } = await supabase.from("products").select("id, name, slug").order("name");
+    if (data) setProducts(data as ProductLite[]);
+  };
+
+  useEffect(() => { fetchCoupons(); fetchProducts(); }, []);
+
+  const productMap = useMemo(() => {
+    const m: Record<string, ProductLite> = {};
+    products.forEach((p) => { m[p.id] = p; });
+    return m;
+  }, [products]);
 
   const handleSave = async () => {
     if (!form.code.trim()) { toast.error("Coupon code is required"); return; }
     if (form.discount_value <= 0) { toast.error("Discount value must be greater than 0"); return; }
+    if (form.applies_to === "specific" && form.product_ids.length === 0) {
+      toast.error("Select at least one product or change scope to All Products");
+      return;
+    }
     setSaving(true);
 
     const payload = {
@@ -67,6 +97,8 @@ const AdminCoupons = () => {
       active: form.active,
       starts_at: form.starts_at || null,
       expires_at: form.expires_at || null,
+      applies_to: form.applies_to,
+      product_ids: form.applies_to === "specific" ? form.product_ids : [],
     };
 
     let error;
@@ -99,6 +131,8 @@ const AdminCoupons = () => {
       active: c.active,
       starts_at: c.starts_at ? c.starts_at.split("T")[0] : "",
       expires_at: c.expires_at ? c.expires_at.split("T")[0] : "",
+      applies_to: c.applies_to || "all",
+      product_ids: c.product_ids || [],
     });
     setDialogOpen(true);
   };
@@ -115,6 +149,15 @@ const AdminCoupons = () => {
     fetchCoupons();
   };
 
+  const toggleProduct = (id: string) => {
+    setForm((f) => ({
+      ...f,
+      product_ids: f.product_ids.includes(id)
+        ? f.product_ids.filter((x) => x !== id)
+        : [...f.product_ids, id],
+    }));
+  };
+
   const isExpired = (d: string | null) => d ? new Date(d) < new Date() : false;
   const notStarted = (d: string | null) => d ? new Date(d) > new Date() : false;
 
@@ -126,7 +169,7 @@ const AdminCoupons = () => {
           <DialogTrigger asChild>
             <Button className="rounded-full"><Plus className="h-4 w-4 mr-2" />Add Coupon</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>{editing ? "Edit Coupon" : "Create Coupon"}</DialogTitle></DialogHeader>
             <div className="space-y-4 pt-2">
               <div>
@@ -149,6 +192,72 @@ const AdminCoupons = () => {
                   <Input type="number" value={form.discount_value} onChange={(e) => setForm({ ...form, discount_value: Number(e.target.value) })} />
                 </div>
               </div>
+
+              {/* Applies To */}
+              <div className="space-y-2 p-3 rounded-lg border bg-muted/30">
+                <Label>Applies To</Label>
+                <Select value={form.applies_to} onValueChange={(v) => setForm({ ...form, applies_to: v, product_ids: v === "all" ? [] : form.product_ids })}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Products</SelectItem>
+                    <SelectItem value="specific">Specific Products</SelectItem>
+                  </SelectContent>
+                </Select>
+
+                {form.applies_to === "specific" && (
+                  <div className="space-y-2 pt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs text-muted-foreground">
+                        {form.product_ids.length} product{form.product_ids.length === 1 ? "" : "s"} selected
+                      </span>
+                      <Popover open={productPickerOpen} onOpenChange={setProductPickerOpen}>
+                        <PopoverTrigger asChild>
+                          <Button variant="outline" size="sm" className="h-8">
+                            <Search className="h-3.5 w-3.5 mr-1.5" />
+                            {form.product_ids.length === 0 ? "Select products" : "Edit selection"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[320px] p-0" align="end">
+                          <Command>
+                            <CommandInput placeholder="Search products..." />
+                            <CommandList>
+                              <CommandEmpty>No products found.</CommandEmpty>
+                              <CommandGroup>
+                                <ScrollArea className="h-64">
+                                  {products.map((p) => {
+                                    const selected = form.product_ids.includes(p.id);
+                                    return (
+                                      <CommandItem key={p.id} value={p.name} onSelect={() => toggleProduct(p.id)} className="cursor-pointer">
+                                        <div className={`mr-2 flex h-4 w-4 items-center justify-center rounded-sm border ${selected ? "bg-primary border-primary text-primary-foreground" : "border-input"}`}>
+                                          {selected && <Check className="h-3 w-3" />}
+                                        </div>
+                                        <span className="truncate">{p.name}</span>
+                                      </CommandItem>
+                                    );
+                                  })}
+                                </ScrollArea>
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    {form.product_ids.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 max-h-24 overflow-y-auto">
+                        {form.product_ids.map((id) => (
+                          <Badge key={id} variant="secondary" className="gap-1 pr-1">
+                            <span className="truncate max-w-[160px]">{productMap[id]?.name || "Unknown"}</span>
+                            <button type="button" onClick={() => toggleProduct(id)} className="hover:bg-background rounded p-0.5">
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>Min Order Amount</Label>
@@ -202,6 +311,11 @@ const AdminCoupons = () => {
                     {!c.active && <Badge variant="secondary">Inactive</Badge>}
                     {notStarted(c.starts_at) && <Badge variant="outline">Scheduled</Badge>}
                     {isExpired(c.expires_at) && <Badge variant="destructive">Expired</Badge>}
+                    {c.applies_to === "specific" ? (
+                      <Badge variant="outline" className="bg-primary/5">{(c.product_ids?.length || 0)} product{(c.product_ids?.length || 0) === 1 ? "" : "s"}</Badge>
+                    ) : (
+                      <Badge variant="outline">All products</Badge>
+                    )}
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {c.discount_type === "percentage" ? `${c.discount_value}% off` : `৳${c.discount_value} off`}
@@ -210,6 +324,12 @@ const AdminCoupons = () => {
                     {c.starts_at ? ` • Starts ${new Date(c.starts_at).toLocaleDateString()}` : ""}
                     {c.expires_at ? ` • Expires ${new Date(c.expires_at).toLocaleDateString()}` : ""}
                   </p>
+                  {c.applies_to === "specific" && (c.product_ids?.length || 0) > 0 && (
+                    <p className="text-xs text-muted-foreground/80 mt-1 truncate">
+                      {c.product_ids!.slice(0, 3).map((id) => productMap[id]?.name || "Unknown").join(", ")}
+                      {c.product_ids!.length > 3 ? ` +${c.product_ids!.length - 3} more` : ""}
+                    </p>
+                  )}
                 </div>
               </div>
               <div className="flex items-center gap-2">
